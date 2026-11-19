@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Petit cœur">
+<meta name="theme-color" content="#4a1d3a">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<title>Petit cœur tout mou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;
+--bg:light-dark(#fff1ec,#1f0f19);--card:light-dark(#ffffff,#2d1724);--ink:light-dark(#3a1430,#ffe9e2);
+--soft:light-dark(#8a5a73,#c9a3b5);--coral:#ff5a4e;--plum:light-dark(#4a1d3a,#ffb3a8);--sea:#12a4a0;
+--line:light-dark(#f3d3ca,#4a2a3b);--lock:light-dark(#f6ddd5,#3a2030)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Fredoka,Nunito,sans-serif;font-weight:600;line-height:1.08;margin:0;text-wrap:balance}
+.hand{font-family:Caveat,cursive}
+.wrap{max-width:760px;margin:0 auto;padding:clamp(18px,4vw,40px) max(4vw,16px) 60px}
+.hello{font-size:15px;color:var(--soft);margin-bottom:6px}
+.hero{background:var(--plum);color:light-dark(#fff1ec,#2a1020);border-radius:28px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:18px;align-items:center;position:relative;overflow:hidden}
+.dodo{font-family:Fredoka;font-size:clamp(64px,17vw,104px);line-height:.9;font-weight:600;color:var(--coral)}
+.dodo small{display:block;font-size:22px;color:inherit;margin-top:6px}
+.until{font-size:15px;opacity:.85;margin-top:8px}
+.polaroid[hidden]{display:none}.polaroid{background:#fff;padding:8px 8px 30px;border-radius:6px;transform:rotate(4deg);box-shadow:0 10px 24px rgba(0,0,0,.25);position:relative}
+.polaroid img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:3px}
+.polaroid span{position:absolute;bottom:4px;left:0;right:0;text-align:center;color:#4a1d3a;font:600 18px Caveat,cursive}
+.trip{grid-column:1/-1;position:relative}
+.trip svg{width:100%;height:auto;display:block;overflow:visible}
+.trip .lbl{font:700 24px Nunito,sans-serif;fill:currentColor}
+.clocks{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;font-size:14px}
+.clocks div{background:rgba(255,255,255,.12);border-radius:999px;padding:6px 12px}
+.clocks b{font-family:Fredoka;font-weight:600}
+.news{margin:18px 0 0;padding:14px 16px;border-radius:18px;background:var(--card);border:2px solid var(--sea);font-weight:700;cursor:pointer;display:none}
+.news.on{display:block}
+h2.sec{font-size:26px;margin:30px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.cell{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;border-radius:18px;background:var(--card);border:2px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;padding:10px;position:relative;transition:transform .2s}
+.cell:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.cell .n{font-family:Fredoka;font-size:30px;font-weight:600;line-height:1}
+.cell .d{font-size:12px;color:var(--soft)}
+.cell .t{font-size:12px;font-weight:700;line-height:1.2}
+.cell.locked{background:var(--lock);border-color:transparent;cursor:default;color:var(--soft)}
+.cell.today{border-color:var(--coral);box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 30%,transparent)}
+.cell.done{background:color-mix(in srgb,var(--coral) 14%,var(--card))}
+.cell .dot{position:absolute;top:9px;right:9px;width:12px;height:12px;border-radius:50%;background:var(--sea)}
+.cell .heart{position:absolute;top:8px;right:8px;width:16px;height:16px;fill:var(--coral)}
+.cell.preview{opacity:.75;border-style:dashed}
+@media(prefers-reduced-motion:no-preference){.cell:not(.locked):active{transform:scale(.96)}}
+.day{position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:5;display:none}
+.day.on{display:block}
+.back{all:unset;cursor:pointer;font-weight:700;color:var(--soft);padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
+.back:focus-visible{outline:3px solid var(--sea)}
+.dayhead .k{font-size:14px;color:var(--soft);font-weight:700}
+.dayhead h1{font-size:clamp(32px,8vw,46px);margin:4px 0 6px}
+.block{background:var(--card);border-radius:22px;padding:18px;margin-top:18px;border:1px solid var(--line)}
+.block h3{font-size:22px;margin-bottom:4px}
+.block .intro{color:var(--soft);margin:0 0 12px}
+.note{font-family:Caveat,cursive;font-size:26px;line-height:1.25;white-space:pre-wrap}
+.note .sig{display:block;text-align:right;margin-top:8px;color:var(--coral)}
+label.q{display:block;font-weight:700;margin:14px 0 6px}
+textarea,input[type=text]{width:100%;font:16px Nunito,sans-serif;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--sea)}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;background:var(--coral);color:#fff;font-weight:700;border-radius:999px;padding:12px 22px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;margin-top:16px}
+.btn:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.btn.ghost{background:transparent;color:var(--soft);border:2px solid var(--line)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.pairs{display:grid;gap:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair .qq{grid-column:1/-1;font-weight:700;margin-top:6px}
+.opt{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;border:2px solid var(--line);border-radius:14px;padding:10px;min-height:44px;font-weight:700}
+.opt.sel{background:var(--sea);border-color:var(--sea);color:#fff}
+.opt:focus-visible{outline:3px solid var(--coral)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.duo>div{background:var(--bg);border-radius:14px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.duo .who{display:block;font-size:13px;font-weight:700;color:var(--coral);margin-bottom:2px;white-space:normal}
+.duo img,.solo img{width:100%;border-radius:10px;display:block;margin-top:4px}
+.wait{margin-top:12px;padding:12px;border-radius:14px;background:color-mix(in srgb,var(--sea) 14%,transparent);font-weight:700}
+.score{font-family:Fredoka;font-size:44px;color:var(--coral);line-height:1}
+.match{font-size:13px;font-weight:700;color:var(--sea)}
+.miss{font-size:13px;font-weight:700;color:var(--soft)}
+.file{display:block;margin-top:4px;font:15px Nunito}
+.pv{max-width:220px;border-radius:12px;margin-top:8px;display:block}
+.coupon{display:flex;justify-content:space-between;align-items:center;gap:10px;border:2px dashed var(--coral);border-radius:16px;padding:12px 14px;margin-top:10px}
+.coupon b{font-family:Fredoka;font-weight:600;font-size:18px}
+.coupon.used{opacity:.55;border-style:solid}
+.coupon .btn{margin:0;padding:8px 16px}
+.list{margin:8px 0 0;padding-left:20px}
+.list li{margin:4px 0}
+.banner{background:var(--card);border:2px solid var(--coral);border-radius:16px;padding:12px 14px;margin-top:14px;font-weight:600;display:none}
+.banner.on{display:block}
+.err{color:var(--coral);font-weight:700;margin-top:10px}
+footer{color:var(--soft);font-size:13px;text-align:center;margin-top:40px}
+@media(max-width:600px){.hero{grid-template-columns:minmax(0,1fr) 112px;padding:18px}.duo:not(.tight){grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<main class="wrap" id="home">
+  <div class="hello" id="hello">Coucou petit cœur tout mou</div>
+  <section class="hero" aria-label="Compte à rebours">
+    <div>
+      <div class="dodo"><span id="dodo">…</span><small id="dodoLbl">dodos avant de se retrouver</small></div>
+      <div class="until">Jusqu'au 7 décembre, quand l'avion te ramène à Bordeaux</div>
+    </div>
+    <div class="polaroid" id="pol1" hidden><img id="ph1" alt="Kevin et Awen"><span>nous deux</span></div>
+    <div class="trip">
+      <svg viewBox="0 0 600 140" role="img" aria-label="Le trajet de Martinique à Bordeaux">
+        <path id="arc" d="M30 95 C 180 -10, 420 -10, 570 70" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
+        <path id="done" d="M30 95 C 180 -10, 420 -10, 570 70" fill="none" stroke="#ff5a4e" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="30" cy="95" r="6" fill="#12a4a0"/><circle cx="570" cy="70" r="6" fill="#ff5a4e"/>
+        <text class="lbl" x="10" y="132">Martinique</text><text class="lbl" x="590" y="104" text-anchor="end">Bordeaux</text>
+        <g id="plane"><path d="M-14 0 L14 0 M2 0 L-6 -11 L-1 -11 L9 0 L-1 11 L-6 11 Z M-12 0 L-15 -5 L-13 -5 L-9 0 L-13 5 L-15 5 Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></g>
+      </svg>
+    </div>
+    <div class="clocks"><div><span id="lMq">Chez toi, en Martinique</span> <b id="cMq">--:--</b></div><div><span id="lBx">Chez moi, à Bordeaux</span> <b id="cBx">--:--</b></div></div>
+  </section>
+  <div class="news" id="news" role="button" tabindex="0"></div>
+  <div class="banner" id="banner"></div>
+  <div class="block" id="kpanel" hidden><h3>Les photos de la page d'accueil</h3><p class="intro">Visible seulement par toi. Choisis les deux photos de vous (la première s'affiche en haut, la seconde dans le récap de la veille du retour).</p><label class="q" for="up1">Photo 1</label><input class="file" type="file" accept="image/*" id="up1" data-asset="asset1"><label class="q" for="up2">Photo 2</label><input class="file" type="file" accept="image/*" id="up2" data-asset="asset2"><div class="err" id="kerr" hidden></div><p class="intro" id="kok"></p></div>
+  <h2 class="sec">Une case par jour</h2>
+  <div class="grid" id="grid"></div>
+  <footer class="hand" style="font-size:22px">fait avec beaucoup d'amour, depuis Bordeaux</footer>
+</main>
+<section class="day" id="day" aria-live="polite"><div class="wrap" id="dayIn"></div></section>
+
+<script>
+{
+const T = (q, qk) => ({ kind: 'text', q, qk });
+const P = (q, qk, optional) => ({ kind: 'photo', q, qk, optional });
+const S = (q, qk) => ({ kind: 'song', q, qk });
+const DAYS = [
+ { t: "Bon voyage, petit cœur", b: [
+   { type: 'note', key: 'note1' },
+   { type: 'choices', title: "Ceci ou cela", intro: "Choisis vite, sans réfléchir. On verra à quel point on se ressemble.",
+     items: [["Plage","Montagne"],["Café","Thé"],["Chien","Chat"],["Lève-tôt","Couche-tard"],["Sucré","Salé"],["Film","Série"],["Pizza","Sushis"],["Grasse mat'","Petit-déj dehors"],["Concert","Soirée canapé"],["Mer","Piscine"]].map(o => ({ opts: o })) } ] },
+ { t: "Le portrait chinois", b: [{ type: 'q', intro: "Réponds au premier truc qui te vient.", items: [T("Si tu étais un plat ?"),T("Si tu étais une ville ?"),T("Si tu étais une chanson ?"),T("Si tu étais un animal ?"),T("Si tu étais une saison ?"),T("Si tu étais un objet ?")] }] },
+ { t: "Défi photo : premier paysage", b: [{ type: 'q', intro: "Toi tu m'envoies la Martinique, moi je t'envoie Bordeaux. On compare.", items: [P("Ton premier paysage martiniquais","Ma vue de Bordeaux aujourd'hui"),T("Une petite légende ?")] }] },
+ { t: "Deux vérités, un mensonge", b: [{ type: 'truths' }] },
+ { t: "Mes petites manies", b: [{ type: 'q', intro: "Ici on avoue tout, on ne juge pas (enfin, un peu).", items: [T("Une manie bizarre que tu assumes"),T("Ce que tu fais quand personne ne te regarde"),T("Ton rituel du matin"),T("Ton petit plaisir coupable")] }] },
+ { t: "Notre playlist", b: [{ type: 'q', intro: "On commence notre playlist à deux. Elle grandira jusqu'à ton retour.", items: [S("Une chanson importante pour toi (titre et artiste)"),T("Pourquoi elle compte pour toi")] }] },
+ { t: "Quand on était petits", b: [{ type: 'q', items: [T("Quelle petite fille tu étais ?","Quel petit garçon j'étais"),T("Ton dessin animé ou jouet préféré"),T("Le métier dont tu rêvais"),T("Une bêtise mémorable"),P("Une photo de toi petite, si tu oses","Une photo de moi petit",true)] }] },
+ { t: "Qui de nous deux ?", b: [{ type: 'vote', intro: "Réponds honnêtement. Je réponds de mon côté, et on voit si on est d'accord.",
+   items: ["Qui s'endort en premier devant un film ?","Qui est le plus râleur le matin ?","Qui a craqué en premier ?","Qui cuisine le mieux ?","Qui est le plus têtu ?","Qui pleure devant les films ?","Qui envoie le premier message le matin ?","Qui sera en retard au rendez-vous ?"] }] },
+ { t: "Nos premières fois", b: [{ type: 'q', items: [T("Ton premier souvenir de moi"),T("La première chose que tu as remarquée chez moi"),T("Le premier moment où tu t'es dit « oh oh… »"),T("Une première fois qu'on doit absolument vivre ensemble")] }] },
+ { t: "Les essentiels", b: [{ type: 'q', items: [T("Ton film refuge"),T("Ton plat réconfort"),T("Ton endroit préféré au monde"),T("L'odeur qui te rend heureuse","L'odeur qui me rend heureux"),T("La série que tu peux revoir dix fois")] }] },
+ { t: "Défi photo : un sourire", b: [{ type: 'q', items: [P("Un truc qui t'a fait sourire aujourd'hui","Un truc qui m'a fait sourire aujourd'hui"),T("Raconte")] }] },
+ { t: "Rêves et envies", b: [{ type: 'q', items: [T("Le pays où tu rêves d'aller"),T("Un truc que tu veux apprendre un jour"),T("Ton rêve un peu fou"),T("Ta vie idéale dans dix ans")] }] },
+ { t: "Ce qui m'a fait craquer", b: [{ type: 'q', items: [T("Ce qui t'a fait craquer chez moi"),T("Le moment où tu as su"),T("Une qualité que j'ai et que je ne vois pas"),S("La chanson qui te fait penser à moi (pour la playlist)")] }] },
+ { t: "Tu me connais maintenant ?", b: [{ type: 'quiz', intro: "Tout ce qu'on s'est dit depuis ton départ… Voyons ce que tu as retenu sur {o}.",
+   items: [{ q: "Si {o} était une ville", ref: [2,0,1] },{ q: "Le plat réconfort de {o}", ref: [10,0,1] },{ q: "Le pays où {o} rêve d'aller", ref: [12,0,0] },{ q: "Le métier dont {o} rêvait petit·e", ref: [7,0,2] },{ q: "Le petit plaisir coupable de {o}", ref: [5,0,3] },{ q: "Le film refuge de {o}", ref: [10,0,0] }] }] },
+ { t: "Nos projets", b: [{ type: 'q', intro: "On se projette, sans retenue.", items: [T("Un voyage à faire à deux"),T("Un truc à faire ensemble cet hiver"),T("Où on sera dans un an"),T("Une tradition qu'on va créer"),T("La première chose qu'on fait à mon retour","La première chose qu'on fait à ton retour")] }] },
+ { t: "Une lettre pour toi", b: [{ type: 'letter', key: 'd16letter' }, { type: 'q', only: 'awen', title: "Ta réponse", items: [T("Écris-moi ce que tu veux")] }] },
+ { t: "Dernier coucher de soleil", b: [
+   { type: 'q', items: [P("Ton dernier coucher de soleil là-bas","Le ciel de Bordeaux ce soir"),T("Un mot ?")] },
+   { type: 'choices', title: "Notre futur : vrai ou faux ?", intro: "Chacun répond de son côté.",
+     items: ["On partira en voyage ensemble l'été prochain","On aura un animal ensemble","On passera le Nouvel An ensemble","On vivra ensemble un jour","On ira en Martinique tous les deux"].map(q => ({ q, opts: ["Vrai","Faux"] })) } ] },
+ { t: "La veille du retour", b: [{ type: 'recap' }, { type: 'q', items: [T("Ce que tu as préféré dans ces trois semaines")] }] },
+ { t: "Le jour des retrouvailles", b: [{ type: 'letter', key: 'd19letter' }, { type: 'coupons', items: ["Un massage","Un petit-déj au lit","Tu choisis le film, sans discuter","Une soirée surprise organisée par moi","Un resto de ton choix","Des câlins illimités"] }] }
+];
+const NAMES = { kevin: 'Kevin', awen: 'Awen' };
+let me = 'awen', other = 'kevin', isOwner = false;
+const SB = 'https://fxerdmyzkvrmhcoabjqp.supabase.co', KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4ZXJkbXl6a3ZybWhjb2FianFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwOTE2MTAsImV4cCI6MjExMDY2NzYxMH0.fP-qzWhzYlSVgzfa6sMZDdeOdlYnq70YB7Ry3l2qVLE';
+let TOKEN = new URLSearchParams(location.search).get('k') || '';
+try { if (TOKEN) localStorage.setItem('pc_k', TOKEN); else TOKEN = localStorage.getItem('pc_k') || ''; } catch { }
+const R = {}; // documents de la collection "r"
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const img = s => typeof s === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(s) ? `<img src="${s}" alt="">` : '';
+const key = (n, i, who) => `d${n}b${i}_${who}`;
+const get = k => R[k] || null;
+const qt = (it) => (me === 'kevin' && it.qk) ? it.qk : it.q;
+const ot = s => s.replaceAll('{o}', NAMES[other]);
+
+function partsIn(tz, d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('fr-FR', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(d).map(x => [x.type, x.value]));
+  return p;
+}
+function mqDayIndex() { // jour du séjour selon l'heure de Martinique : 1 = 19 nov
+  const p = partsIn('America/Martinique');
+  const t = Date.UTC(+p.year, +p.month - 1, +p.day);
+  return Math.round((t - Date.UTC(2026, 10, 18)) / 864e5);
+}
+const dateOf = n => new Date(Date.UTC(2026, 10, 18 + n)).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const unlocked = n => n <= mqDayIndex();
+
+function tick() {
+  const today = mqDayIndex();
+  const left = Math.max(0, 19 - today);
+  $('#dodo').textContent = left;
+  $('#dodoLbl').textContent = left === 0 ? "c'est aujourd'hui !" : left === 1 ? 'dernier dodo avant de se retrouver' : 'dodos avant de se retrouver';
+  const pm = partsIn('America/Martinique'), pb = partsIn('Europe/Paris');
+  $('#cMq').textContent = `${pm.hour}:${pm.minute}`; $('#cBx').textContent = `${pb.hour}:${pb.minute}`;
+  const start = Date.UTC(2026, 10, 19, 4), end = Date.UTC(2026, 11, 7, 4);
+  const prog = Math.min(1, Math.max(0, (Date.now() - start) / (end - start)));
+  const arc = $('#arc'), L = arc.getTotalLength(), at = L * prog;
+  const p1 = arc.getPointAtLength(at), p2 = arc.getPointAtLength(Math.min(L, at + 1));
+  const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+  $('#plane').setAttribute('transform', `translate(${p1.x} ${p1.y}) rotate(${prog >= 1 ? 20 : ang}) scale(1.7)`);
+  const done = $('#done'); done.style.strokeDasharray = `${at} ${L}`;
+}
+
+// --- état de chaque bloc ---
+const answerable = blk => !['note','letter','recap'].includes(blk.type);
+function blockState(n, i, blk) {
+  if (!answerable(blk)) return null;
+  if (blk.only && blk.only !== me) return { mine: true, theirs: !!get(key(n, i, other)) };
+  if (blk.type === 'coupons') return { mine: true, theirs: true };
+  return { mine: !!get(key(n, i, me)), theirs: !!get(key(n, i, other)) };
+}
+function dayState(n) {
+  const sts = DAYS[n - 1].b.map((b, i) => blockState(n, i, b)).filter(Boolean);
+  const letterNew = DAYS[n - 1].b.some(b => b.type === 'letter' && me === 'awen' && get(b.key));
+  return { todo: sts.some(s => !s.mine), news: sts.some(s => !s.mine && s.theirs), both: sts.length > 0 && sts.every(s => s.mine && s.theirs), letterNew };
+}
+
+function renderGrid() {
+  const today = mqDayIndex();
+  $('#grid').innerHTML = DAYS.map((d, k) => {
+    const n = k + 1, open = unlocked(n), see = open || isOwner;
+    const st = see ? dayState(n) : {};
+    const cls = ['cell', !see && 'locked', n === today && 'today', !open && isOwner && 'preview', see && st.both && 'done'].filter(Boolean).join(' ');
+    const mark = see && st.both ? '<svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg>' : see && (st.news || (open && st.todo)) ? '<span class="dot"></span>' : '';
+    return `<button class="${cls}" data-n="${n}" ${see ? '' : 'disabled aria-disabled="true"'} aria-label="Jour ${n}, ${dateOf(n)}${see ? ', ' + esc(d.t) : ', pas encore ouvert'}">
+      ${mark}<span class="n">${n}</span><span>${see ? `<span class="t">${esc(d.t)}</span>` : ''}<span class="d" style="display:block">${dateOf(n)}</span></span></button>`;
+  }).join('');
+  const waiting = DAYS.map((_, k) => k + 1).filter(n => unlocked(n) && dayState(n).news);
+  const nb = $('#news');
+  if (waiting.length) { nb.classList.add('on'); nb.dataset.n = waiting[0]; nb.textContent = `${NAMES[other]} a répondu à la case ${waiting[0]}. À toi de jouer pour découvrir sa réponse !`; }
+  else nb.classList.remove('on');
+}
+
+// --- rendu des blocs ---
+function whoLbl(w) { return w === me ? 'Toi' : NAMES[w]; }
+function renderQ(n, i, blk) {
+  const mineDoc = get(key(n, i, me)), theirDoc = get(key(n, i, other));
+  const editing = editState[`${n}_${i}`];
+  const head = (blk.title ? `<h3>${esc(blk.title)}</h3>` : '') + (blk.intro ? `<p class="intro">${esc(blk.intro)}</p>` : '');
+  if (blk.only && blk.only !== me) {
+    return head + (theirDoc ? blk.items.map((it, j) => `<div class="solo"><label class="q">${esc(it.q)}</label><div class="duo" style="grid-template-columns:1fr"><div>${it.kind === 'photo' ? img(theirDoc.a?.[j]) : esc(theirDoc.a?.[j])}</div></div></div>`).join('') : `<div class="wait">${NAMES[other]} n'a pas encore répondu.</div>`);
+  }
+  if (!mineDoc || editing) {
+    return head + `<form data-form="q" data-n="${n}" data-i="${i}">` + blk.items.map((it, j) => {
+      const v = mineDoc?.a?.[j] ?? '';
+      if (it.kind === 'photo') return `<label class="q" for="f${n}_${i}_${j}">${esc(qt(it))}${it.optional ? ' (facultatif)' : ''}</label><input class="file" type="file" accept="image/*" id="f${n}_${i}_${j}" data-j="${j}">${img(v) ? `<img class="pv" id="pv${n}_${i}_${j}" src="${v}" alt="">` : `<img class="pv" id="pv${n}_${i}_${j}" hidden alt="">`}`;
+      return `<label class="q" for="t${n}_${i}_${j}">${esc(qt(it))}</label><textarea id="t${n}_${i}_${j}" rows="${blk.only ? 8 : 2}" data-j="${j}">${esc(v)}</textarea>`;
+    }).join('') + `<button class="btn" type="submit">${mineDoc ? 'Enregistrer' : 'Envoyer ma réponse'}</button><div class="err" hidden></div></form>`
+      + (theirDoc && !mineDoc ? `<div class="wait">${NAMES[other]} a déjà répondu. Réponds pour découvrir ses réponses.</div>` : '');
+  }
+  const out = blk.items.map((it, j) => {
+    const cell = (doc, w) => `<div><span class="who">${whoLbl(w)}</span>${it.kind === 'photo' ? (img(doc?.a?.[j]) || '<em>pas de photo</em>') : esc(doc?.a?.[j] || '—')}</div>`;
+    return `<label class="q">${esc(qt(it))}</label><div class="duo">${cell(mineDoc, me)}${theirDoc ? cell(theirDoc, other) : `<div><span class="who">${NAMES[other]}</span><em>en attente…</em></div>`}</div>`;
+  }).join('');
+  return head + out + (theirDoc ? '' : `<div class="wait">Ta réponse est envoyée. Tu découvriras celle de ${NAMES[other]} dès qu'il${other === 'awen' ? ' ou elle' : ''} aura répondu.</div>`)
+    + `<button class="btn ghost" data-edit="${n}_${i}">Modifier ma réponse</button>`;
+}
+
+function renderChoices(n, i, blk, isVote) {
+  const mineDoc = get(key(n, i, me)), theirDoc = get(key(n, i, other));
+  const head = `<h3>${esc(blk.title || DAYS[n - 1].t)}</h3>` + (blk.intro ? `<p class="intro">${esc(blk.intro)}</p>` : '');
+  const items = isVote ? blk.items.map(q => ({ q, opts: ['Moi', NAMES[other]] })) : blk.items;
+  // pour le vote on stocke la personne choisie : 'kevin' ou 'awen'
+  const toVal = j => isVote ? (j === 0 ? me : other) : j;
+  if (!mineDoc || editState[`${n}_${i}`]) {
+    const cur = draft[`${n}_${i}`] ||= (mineDoc?.a ? [...mineDoc.a] : []);
+    return head + `<div class="pairs">` + items.map((it, k) => `<div class="pair">${it.q ? `<div class="qq">${esc(it.q)}</div>` : ''}${it.opts.map((o, j) => `<button class="opt ${cur[k] === toVal(j) ? 'sel' : ''}" data-pick="${n}_${i}_${k}" data-v="${toVal(j)}">${esc(o)}</button>`).join('')}</div>`).join('') + `</div>`
+      + `<button class="btn" data-sendc="${n}_${i}" ${cur.filter(v => v !== undefined && v !== null).length < items.length ? 'disabled' : ''}>Envoyer mes choix</button><div class="err" hidden></div>`
+      + (theirDoc && !mineDoc ? `<div class="wait">${NAMES[other]} a déjà choisi. À toi pour découvrir !</div>` : '');
+  }
+  const lbl = (it, v) => isVote ? whoLbl(v) : it.opts[v];
+  let same = 0;
+  const rows = items.map((it, k) => {
+    const a = mineDoc.a[k], b = theirDoc?.a?.[k];
+    const ok = theirDoc && a === b; if (ok) same++;
+    return `${it.q ? `<label class="q">${esc(it.q)}</label>` : `<label class="q">${esc(it.opts.join(' ou '))}</label>`}<div class="duo tight"><div><span class="who">Toi</span>${esc(lbl(it, a))}</div><div><span class="who">${NAMES[other]}</span>${theirDoc ? esc(lbl(it, b)) : '<em>en attente…</em>'}</div></div>${theirDoc ? `<div class="${ok ? 'match' : 'miss'}">${ok ? 'pareil !' : 'pas pareil'}</div>` : ''}`;
+  }).join('');
+  const score = theirDoc ? `<div class="score">${Math.round(same / items.length * 100)} %</div><p class="intro">${isVote ? "d'accord sur qui est qui" : 'de choix en commun'}</p>` : `<div class="wait">Tes choix sont envoyés. Résultat dès que ${NAMES[other]} aura répondu.</div>`;
+  return head + score + rows + `<button class="btn ghost" data-edit="${n}_${i}">Modifier mes choix</button>`;
+}
+
+function renderTruths(n, i) {
+  const mine = get(key(n, i, me)), theirs = get(key(n, i, other));
+  const myGuess = get(key(n, i, 'g' + me)), theirGuess = get(key(n, i, 'g' + other));
+  let h = `<h3>Deux vérités, un mensonge</h3><p class="intro">Écris trois choses sur toi : deux vraies, une fausse. Coche le mensonge. Ensuite, chacun essaie de démasquer l'autre.</p>`;
+  if (!mine || editState[`${n}_${i}`]) {
+    h += `<form data-form="truths" data-n="${n}" data-i="${i}">` + [0,1,2].map(j => `<label class="q" for="tr${j}">Affirmation ${j + 1}</label><textarea id="tr${j}" rows="2">${esc(mine?.a?.s?.[j] || '')}</textarea><label style="display:flex;gap:8px;align-items:center;margin-top:6px;min-height:44px"><input type="radio" name="lie" value="${j}" ${mine?.a?.lie === j ? 'checked' : ''}> C'est le mensonge</label>`).join('') + `<button class="btn" type="submit">Envoyer</button><div class="err" hidden></div></form>`;
+  } else {
+    h += `<label class="q">Tes trois affirmations</label><ol class="list">${mine.a.s.map((s, j) => `<li>${esc(s)}${j === mine.a.lie ? ' <span class="miss">(ton mensonge)</span>' : ''}</li>`).join('')}</ol>`;
+    h += theirGuess ? `<div class="wait">${NAMES[other]} a parié sur la n°${theirGuess.a + 1} : ${theirGuess.a === mine.a.lie ? 'bien vu, démasqué !' : 'raté, tu l\'as bien eu·e !'}</div>` : `<div class="wait">${NAMES[other]} n'a pas encore deviné.</div>`;
+  }
+  h += `<label class="q" style="margin-top:22px">Le mensonge de ${NAMES[other]}</label>`;
+  if (!theirs) h += `<div class="wait">${NAMES[other]} n'a pas encore écrit ses affirmations.</div>`;
+  else if (!myGuess) h += `<div class="pairs">${theirs.a.s.map((s, j) => `<button class="opt" data-guess="${n}_${i}_${j}" style="text-align:left">${esc(s)}</button>`).join('')}</div><p class="intro">Touche celle que tu crois fausse.</p>`;
+  else h += `<ol class="list">${theirs.a.s.map((s, j) => `<li>${esc(s)}${j === theirs.a.lie ? ' <span class="match">(le mensonge)</span>' : ''}${j === myGuess.a && j !== theirs.a.lie ? ' <span class="miss">(ton pari)</span>' : ''}</li>`).join('')}</ol><div class="${myGuess.a === theirs.a.lie ? 'match' : 'miss'}">${myGuess.a === theirs.a.lie ? 'Tu l\'as démasqué·e !' : 'Raté, bien joué à ' + NAMES[other] + ' !'}</div>`;
+  return h;
+}
+
+function renderQuiz(n, i, blk) {
+  const mine = get(key(n, i, me)), theirs = get(key(n, i, other));
+  let h = `<h3>Tu me connais maintenant ?</h3><p class="intro">${esc(ot(blk.intro))}</p>`;
+  if (!mine || editState[`${n}_${i}`]) {
+    return h + `<form data-form="q" data-n="${n}" data-i="${i}">` + blk.items.map((it, j) => `<label class="q" for="z${j}">${esc(ot(it.q))}</label><input type="text" id="z${j}" data-j="${j}" value="${esc(mine?.a?.[j] || '')}">`).join('') + `<button class="btn" type="submit">Voir si j'ai bon</button><div class="err" hidden></div></form>`;
+  }
+  const real = (w, ref, j) => get(key(ref[0], ref[1], w))?.a?.[ref[2]];
+  h += blk.items.map((it, j) => `<label class="q">${esc(ot(it.q))}</label><div class="duo"><div><span class="who">Ta réponse</span>${esc(mine.a[j] || '—')}</div><div><span class="who">Ce qu'a dit ${NAMES[other]}</span>${esc(real(other, it.ref) || 'pas encore répondu')}</div></div>`).join('');
+  h += `<label class="q" style="margin-top:22px">Et ${NAMES[other]}, que sait-il${other === 'awen' ? ' ou elle' : ''} de toi ?</label>`;
+  h += theirs ? blk.items.map((it, j) => `<div class="duo"><div><span class="who">${NAMES[other]} pense</span>${esc(theirs.a[j] || '—')}</div><div><span class="who">Ta vraie réponse</span>${esc(real(me, it.ref) || '—')}</div></div>`).join('') : `<div class="wait">${NAMES[other]} n'a pas encore joué.</div>`;
+  return h;
+}
+
+function renderLetter(n, i, blk) {
+  const doc = get(blk.key);
+  if (isOwner) {
+    return `<h3>Ta lettre pour Awen</h3><p class="intro">Elle la découvrira le jour ${n}. Tu peux l'écrire maintenant et la modifier jusque-là.</p><form data-form="letter" data-key="${blk.key}"><textarea rows="10" aria-label="Lettre">${esc(doc?.text || '')}</textarea><button class="btn" type="submit">Enregistrer la lettre</button><div class="err" hidden></div></form>`;
+  }
+  return doc?.text ? `<div class="note">${esc(doc.text)}<span class="sig">Kevin</span></div>` : `<div class="note">Kevin est encore en train d'écrire cette lettre… reviens un peu plus tard.</div>`;
+}
+
+function renderRecap() {
+  const songs = [], projets = [];
+  DAYS.forEach((d, k) => d.b.forEach((b, i) => { if (b.type !== 'q') return; b.items.forEach((it, j) => {
+    ['kevin','awen'].forEach(w => { const v = get(key(k + 1, i, w))?.a?.[j]; if (!v) return;
+      if (it.kind === 'song') songs.push(`${esc(v)} <span class="miss">(${NAMES[w]})</span>`);
+      if (k + 1 === 15) projets.push(`${esc(v)} <span class="miss">(${NAMES[w]})</span>`); });
+  }); }));
+  const agree = [[1,1],[17,1]].map(([n, i]) => { const a = get(key(n, i, 'kevin'))?.a, b = get(key(n, i, 'awen'))?.a; if (!a || !b) return null; return Math.round(a.filter((v, x) => v === b[x]).length / a.length * 100); });
+  const answered = DAYS.reduce((s, d, k) => s + d.b.filter((b, i) => get(key(k + 1, i, 'kevin')) && get(key(k + 1, i, 'awen'))).length, 0);
+  return `<h3>Nos trois semaines</h3><div class="polaroid" style="max-width:220px;margin:16px auto 22px;transform:rotate(-3deg)">${img(get('asset2')?.img)}<span>bientôt, on recommence</span></div>
+    <div class="duo"><div><span class="who">Ceci ou cela</span><span class="score" style="font-size:34px">${agree[0] ?? '–'} %</span></div><div><span class="who">Notre futur</span><span class="score" style="font-size:34px">${agree[1] ?? '–'} %</span></div></div>
+    <p class="intro" style="margin-top:10px">${answered} jeux faits à deux depuis ton départ.</p>
+    <label class="q">Notre playlist</label>${songs.length ? `<ul class="list">${songs.map(s => `<li>${s}</li>`).join('')}</ul>` : '<p class="intro">Encore vide.</p>'}
+    <label class="q">Nos projets</label>${projets.length ? `<ul class="list">${projets.map(s => `<li>${s}</li>`).join('')}</ul>` : '<p class="intro">Encore vides.</p>'}`;
+}
+
+function renderCoupons(n, i, blk) {
+  const used = get(key(n, i, 'awen'))?.used || [];
+  return `<h3>Tes bons, valables dès ton retour</h3><p class="intro">${isOwner ? 'Awen verra ici les bons utilisés.' : 'Touche « Utiliser » quand tu veux en profiter. Je suis obligé de dire oui.'}</p>` + blk.items.map((c, j) => {
+    const u = used.includes(j);
+    return `<div class="coupon ${u ? 'used' : ''}"><b>${esc(c)}</b>${u ? '<span class="match">utilisé</span>' : isOwner ? '<span class="miss">dispo</span>' : `<button class="btn" data-coupon="${n}_${i}_${j}">Utiliser</button>`}</div>`;
+  }).join('');
+}
+
+const editState = {}, draft = {};
+let openDay = 0;
+function renderDay() {
+  const n = openDay; if (!n) return;
+  const d = DAYS[n - 1];
+  const html = d.b.map((blk, i) => {
+    let inner = '';
+    if (blk.type === 'note') inner = `<div class="note">${esc(get(blk.key)?.text || '…')}<span class="sig">Kevin</span></div>`;
+    else if (blk.type === 'q') inner = renderQ(n, i, blk);
+    else if (blk.type === 'choices') inner = renderChoices(n, i, blk, false);
+    else if (blk.type === 'vote') inner = renderChoices(n, i, blk, true);
+    else if (blk.type === 'truths') inner = renderTruths(n, i);
+    else if (blk.type === 'quiz') inner = renderQuiz(n, i, blk);
+    else if (blk.type === 'letter') inner = renderLetter(n, i, blk);
+    else if (blk.type === 'recap') inner = renderRecap();
+    else if (blk.type === 'coupons') inner = renderCoupons(n, i, blk);
+    return `<div class="block">${inner}</div>`;
+  }).join('');
+  const active = document.activeElement?.id;
+  const keep = {}; document.querySelectorAll('#dayIn textarea[id],#dayIn input[type=text][id]').forEach(el => keep[el.id] = el.value);
+  $('#dayIn').innerHTML = `<button class="back" id="back">← Retour au calendrier</button><div class="dayhead"><div class="k">Jour ${n} · ${dateOf(n)}${!unlocked(n) ? ' · aperçu (Awen ne la voit pas encore)' : ''}</div><h1>${esc(d.t)}</h1></div>${html}`
+    ;
+  for (const id in keep) { const el = document.getElementById(id); if (el) el.value = keep[id]; }
+  for (const id in photos) { const pv = document.getElementById('pv' + id); if (pv) { pv.src = photos[id]; pv.hidden = false; } }
+  if (active && document.getElementById(active)) document.getElementById(active).focus();
+}
+
+function route() {
+  const m = location.hash.match(/^#jour-(\d+)$/);
+  const n = m ? +m[1] : 0;
+  if (n >= 1 && n <= 19 && (unlocked(n) || isOwner)) { if (openDay !== n) { openDay = n; renderDay(); $('#day').scrollTop = 0; } $('#day').classList.add('on'); document.body.style.overflow = 'hidden'; }
+  else { openDay = 0; $('#day').classList.remove('on'); document.body.style.overflow = ''; renderGrid(); }
+}
+
+// --- écriture ---
+async function rpc(fn, body) {
+  const r = await fetch(`${SB}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) { const e = new Error(await r.text()); e.status = r.status; throw e; }
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+async function save(k, data, errEl) {
+  try { await rpc('pc_save', { t: TOKEN, k, d: { ...data, at: Date.now() } }); R[k] = { ...data }; return true; }
+  catch (e) {
+    if (errEl) { errEl.hidden = false; errEl.textContent = /too large/.test(e.message) ? "La photo est trop lourde, essaie avec une autre." : "Petit souci de connexion, réessaie dans un instant."; }
+    return false;
+  }
+}
+function compress(file, max = 900, q = .72) {
+  return new Promise((res, rej) => {
+    const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { const s = Math.min(1, max / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); let d = c.toDataURL('image/jpeg', q); if (d.length > 200000) { const c2 = document.createElement('canvas'); const s2 = 600 / Math.max(c.width, c.height); c2.width = Math.round(c.width * s2); c2.height = Math.round(c.height * s2); c2.getContext('2d').drawImage(c, 0, 0, c2.width, c2.height); d = c2.toDataURL('image/jpeg', .62); } res(d); };
+    im.onerror = rej; im.src = u;
+  });
+}
+const photos = {};
+document.addEventListener('change', async e => {
+  const f = e.target; if (f.type !== 'file' || !f.files[0]) return;
+  if (f.dataset.asset) { const err = $('#kerr'); err.hidden = true; try { const d = await compress(f.files[0], 900, .75); if (await save(f.dataset.asset, { img: d }, err)) { $('#kok').textContent = 'Photo enregistrée.'; paintHome(); } } catch { err.hidden = false; err.textContent = "Impossible de lire cette photo."; } return; }
+  const form = f.closest('form'); const id = `${form.dataset.n}_${form.dataset.i}_${f.dataset.j}`;
+  try { photos[id] = await compress(f.files[0]); const pv = document.getElementById('pv' + id); pv.src = photos[id]; pv.hidden = false; } catch { }
+});
+document.addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target, err = form.querySelector('.err'), btn = form.querySelector('.btn'); err.hidden = true;
+  if (form.dataset.form === 'letter') {
+    btn.setAttribute('disabled', ''); const ok = await save(form.dataset.key, { text: form.querySelector('textarea').value.trim() }, err); btn.removeAttribute('disabled');
+    if (ok) { btn.textContent = 'Lettre enregistrée'; setTimeout(() => btn.textContent = 'Enregistrer la lettre', 1800); } return;
+  }
+  const n = +form.dataset.n, i = +form.dataset.i, blk = DAYS[n - 1].b[i];
+  if (form.dataset.form === 'truths') {
+    const s = [...form.querySelectorAll('textarea')].map(t => t.value.trim()); const lie = form.querySelector('input[name=lie]:checked');
+    if (s.some(x => !x) || !lie) { err.hidden = false; err.textContent = 'Écris les trois affirmations et coche le mensonge.'; return; }
+    btn.setAttribute('disabled', ''); if (await save(key(n, i, me), { a: { s, lie: +lie.value } }, err)) { delete editState[`${n}_${i}`]; renderDay(); } else btn.removeAttribute('disabled'); return;
+  }
+  const prev = get(key(n, i, me))?.a || [];
+  const a = blk.items.map((it, j) => {
+    if (it.kind === 'photo') return photos[`${n}_${i}_${j}`] || prev[j] || '';
+    const el = form.querySelector(`[data-j="${j}"]`); return el ? el.value.trim() : '';
+  });
+  const missing = blk.items.some((it, j) => !it.optional && !a[j]);
+  if (missing) { err.hidden = false; err.textContent = 'Il manque une réponse (ou une photo).'; return; }
+  btn.setAttribute('disabled', '');
+  if (await save(key(n, i, me), { a }, err)) { delete editState[`${n}_${i}`]; renderDay(); renderGrid(); } else btn.removeAttribute('disabled');
+});
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button,[role=button]'); if (!t) return;
+  if (t.id === 'back') { location.hash = ''; return; }
+  if (t.id === 'news' || t.classList.contains('cell')) { const n = t.dataset.n; if (n) location.hash = 'jour-' + n; return; }
+  if (t.dataset.edit) { editState[t.dataset.edit] = true; delete draft[t.dataset.edit]; renderDay(); return; }
+  if (t.dataset.pick) { const [n, i, k] = t.dataset.pick.split('_'); const d = draft[`${n}_${i}`] ||= []; const v = t.dataset.v; d[+k] = /^\d+$/.test(v) ? +v : v; renderDay(); return; }
+  if (t.dataset.sendc) { const [n, i] = t.dataset.sendc.split('_').map(Number); const err = t.nextElementSibling; t.setAttribute('disabled', ''); if (await save(key(n, i, me), { a: draft[`${n}_${i}`] }, err)) { delete editState[`${n}_${i}`]; delete draft[`${n}_${i}`]; renderDay(); renderGrid(); } else t.removeAttribute('disabled'); return; }
+  if (t.dataset.guess) { const [n, i, j] = t.dataset.guess.split('_').map(Number); if (await save(key(n, i, 'g' + me), { a: j }, null)) renderDay(); return; }
+  if (t.dataset.coupon) { const [n, i, j] = t.dataset.coupon.split('_').map(Number); const used = [...(get(key(n, i, 'awen'))?.used || [])]; if (!used.includes(j)) used.push(j); if (await save(key(n, i, 'awen'), { used }, null)) renderDay(); }
+});
+$('#news').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#news').click(); } });
+window.addEventListener('hashchange', route);
+
+tick(); setInterval(() => { tick(); }, 30000);
+renderGrid(); route();
+
+function paintHome() {
+  const a = img(get('asset1')?.img);
+  if (a) { $('#ph1').src = get('asset1').img; $('#pol1').hidden = false; } else $('#pol1').hidden = true;
+}
+let first = true, loading = false;
+async function load() {
+  if (loading || !TOKEN) return; loading = true;
+  try {
+    const res = await rpc('pc_load', { t: TOKEN });
+    const who = res.who;
+    if (first) {
+      first = false; me = who; other = who === 'kevin' ? 'awen' : 'kevin'; isOwner = who === 'kevin';
+      if (isOwner) { $('#hello').textContent = "Coucou Kevin, tu vois l'appli comme Awen, avec toutes les cases en aperçu"; $('#lMq').textContent = 'Chez Awen, en Martinique'; $('#lBx').textContent = 'Chez toi, à Bordeaux'; $('#kpanel').hidden = false; }
+    }
+    const fresh = res.r || {}; let changed = false;
+    for (const k of new Set([...Object.keys(R), ...Object.keys(fresh)])) if (JSON.stringify(R[k]) !== JSON.stringify(fresh[k])) { changed = true; if (fresh[k] === undefined) delete R[k]; else R[k] = fresh[k]; }
+    $('#banner').classList.remove('on');
+    if (changed) { paintHome(); route(); renderGrid(); if (openDay && !document.activeElement?.matches('textarea,input')) renderDay(); }
+  } catch (e) {
+    const b = $('#banner'); b.classList.add('on');
+    b.textContent = e.status === 400 && /bad token/.test(e.message) ? "Ce lien n'est pas le bon : rouvre le lien que Kevin t'a envoyé." : "Pas de connexion pour l'instant… les réponses arriveront dès que ça revient.";
+  } finally { loading = false; }
+}
+if (!TOKEN) { const b = $('#banner'); b.classList.add('on'); b.textContent = "Ouvre l'appli avec le lien que Kevin t'a envoyé."; }
+load(); setInterval(load, 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });}
+</script>
+</body>
+</html>

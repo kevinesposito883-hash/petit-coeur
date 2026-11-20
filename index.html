@@ -97,6 +97,12 @@ textarea:focus,input:focus{outline:none;border-color:var(--sea)}
 .banner.on{display:block}
 .err{color:var(--coral);font-weight:700;margin-top:10px}
 footer{color:var(--soft);font-size:13px;text-align:center;margin-top:40px}
+.modal{position:fixed;inset:0;background:rgba(36,18,28,.75);z-index:10;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.modal .box{background:var(--card);color:var(--ink);border-radius:24px;padding:22px;max-width:520px;width:100%;max-height:92vh;overflow:auto;text-align:center}
+.modal iframe{width:100%;height:55vh;border:0;border-radius:12px;background:#fff;margin-top:12px}
+.modal img{max-width:100%;border-radius:12px;margin-top:12px}
+.gift{width:84px;height:84px;margin:0 auto 8px;display:block}
 @media(max-width:600px){.hero{grid-template-columns:minmax(0,1fr) 112px;padding:18px}.duo:not(.tight){grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
@@ -128,6 +134,7 @@ footer{color:var(--soft);font-size:13px;text-align:center;margin-top:40px}
   <footer class="hand" style="font-size:22px">fait avec beaucoup d'amour, depuis Bordeaux</footer>
 </main>
 <section class="day" id="day" aria-live="polite"><div class="wrap" id="dayIn"></div></section>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="box" id="mbox"></div></div>
 
 <script>
 {
@@ -140,7 +147,7 @@ const DAYS = [
    { type: 'choices', title: "Ceci ou cela", intro: "Choisis vite, sans réfléchir. On verra à quel point on se ressemble.",
      items: [["Plage","Montagne"],["Café","Thé"],["Chien","Chat"],["Lève-tôt","Couche-tard"],["Sucré","Salé"],["Film","Série"],["Pizza","Sushis"],["Grasse mat'","Petit-déj dehors"],["Concert","Soirée canapé"],["Mer","Piscine"]].map(o => ({ opts: o })) } ] },
  { t: "Le portrait chinois", b: [{ type: 'q', intro: "Réponds au premier truc qui te vient.", items: [T("Si tu étais un plat ?"),T("Si tu étais une ville ?"),T("Si tu étais une chanson ?"),T("Si tu étais un animal ?"),T("Si tu étais une saison ?"),T("Si tu étais un objet ?")] }] },
- { t: "Défi photo olé olé", b: [{ type: 'q', intro: "Chacun de son côté, et c'est toi qui choisis jusqu'où tu vas…", items: [P("Une photo de toi qui va me faire regretter de ne pas être là","Une photo de moi qui va te faire regretter de ne pas être là"),T("Une petite légende ?")] }] },
+ { t: "Défi photo olé olé", b: [{ type: 'q', surprise: 'surprise3', intro: "Chacun de son côté, et c'est toi qui choisis jusqu'où tu vas…", items: [P("Une photo de toi qui va me faire regretter de ne pas être là","Une photo de moi qui va te faire regretter de ne pas être là"),T("Une petite légende ?")] }] },
  { t: "Ceci ou cela, version coquine", b: [{ type: 'choices', title: "Ceci ou cela, version coquine", intro: "Toujours sans réfléchir… mais là, c'est nous deux qu'on imagine.",
    items: [["Le matin","Le soir"],["Lumière allumée","Lumière éteinte"],["Tendre","Sauvage"],["Prendre son temps","L'urgence"],["Chuchoter","Le dire franchement"],["Mener","Se laisser mener"],["Le lit","Ailleurs"],["Habillé·e qui se déshabille","Déjà nu·e"],["Des préliminaires qui durent","Droit au but"],["Les yeux dans les yeux","Les yeux bandés"],["En silence","Qu'on s'entende"],["Câlin après","Fringale après"]].map(o => ({ opts: o })) }] },
  { t: "Défi photo : la Martinique", b: [{ type: 'q', intro: "Toi tu m'envoies la Martinique, moi je t'envoie Bordeaux. On compare.", items: [P("Ta première vue de la Martinique","Ma vue de Bordeaux aujourd'hui"),T("Une petite légende ?")] }] },
@@ -334,6 +341,39 @@ function renderEnvies(n, i, blk) {
   return h + `<button class="btn ghost" data-edit="${n}_${i}">Modifier mes réponses</button>`;
 }
 
+let pendingSurprise = null, autoShown = false;
+const GIFT = '<svg class="gift" viewBox="0 0 64 64"><rect x="8" y="26" width="48" height="32" rx="4" fill="#ff5a4e"/><rect x="4" y="18" width="56" height="12" rx="3" fill="#4a1d3a"/><rect x="28" y="18" width="8" height="40" fill="#12a4a0"/><path d="M32 18c-6-12-20-10-14 0zM32 18c6-12 20-10 14 0z" fill="#12a4a0"/></svg>';
+function surpriseReady(n, i) { return !!(get(key(n, i, 'kevin')) && get(key(n, i, 'awen'))); }
+function renderSurprise(n, i, blk) {
+  const s = get(blk.surprise);
+  if (isOwner) return `<div class="block" style="border:2px dashed var(--coral);margin-top:22px"><h3>Ta surprise pour Awen</h3><p class="intro">Elle la découvrira dès que vous aurez envoyé vos deux photos. Avant ça, elle voit seulement qu'une surprise l'attend.</p><label class="q" for="sfile">Le fichier (PDF ou image, 4 Mo max)</label><input class="file" type="file" id="sfile" accept="application/pdf,image/*" data-surprise="${blk.surprise}">${s ? `<p class="match">Fichier enregistré : ${esc(s.name)}</p>` : ''}<label class="q" for="smsg">Le petit mot qui l'accompagne</label><textarea id="smsg" rows="3">${esc(s?.msg ?? "Le week-end du 18 décembre, je t'emmène à PortAventura. Rien que nous deux.")}</textarea><button class="btn" data-ssave="${blk.surprise}">Enregistrer la surprise</button><div class="err" id="serr" hidden></div><p class="intro" id="sok"></p></div>`;
+  if (!s) return '';
+  if (!surpriseReady(n, i)) return `<div class="wait" style="margin-top:22px">Une surprise t'attend ici… elle s'ouvrira quand on aura envoyé nos deux photos.</div>`;
+  return `<button class="btn" data-surp="${blk.surprise}" style="width:100%;margin-top:22px">Ouvre ta surprise</button>`;
+}
+async function openSurprise() {
+  const m = $('#modal'), b = $('#mbox');
+  b.innerHTML = `${GIFT}<h2>Une surprise pour toi…</h2><p class="intro">Ouverture…</p>`; m.classList.add('on');
+  try {
+    const s = await rpc('pc_surprise', { t: TOKEN });
+    if (!s || typeof s.data !== 'string' || !/^data:(application\/pdf|image\/(jpeg|png|webp|heic|gif));base64,/.test(s.data)) throw new Error('vide');
+    const url = URL.createObjectURL(await (await fetch(s.data)).blob());
+    const isImg = s.data.startsWith('data:image/');
+    b.innerHTML = `${GIFT}<h2>Surprise !</h2>${s.msg ? `<div class="note" style="margin-top:10px">${esc(s.msg)}<span class="sig">Kevin</span></div>` : ''}${isImg ? `<img src="${url}" alt="Ta surprise">` : `<iframe src="${url}" title="Tes billets"></iframe>`}<a class="btn" href="${url}" target="_blank" rel="noopener" download="${esc(s.name || 'surprise')}">Ouvrir ${isImg ? "l'image" : 'les billets'}</a> <button class="btn ghost" id="mclose">Fermer</button>`;
+    try { localStorage.setItem('pc_surprise_seen', '1'); } catch { }
+  } catch (e) {
+    b.innerHTML = `${GIFT}<h2>Pas encore…</h2><p class="intro">La surprise s'ouvrira quand on aura envoyé nos deux photos.</p><button class="btn ghost" id="mclose">Fermer</button>`;
+  }
+}
+function autoSurprise() {
+  if (isOwner || autoShown || !openDay) return;
+  const d = DAYS[openDay - 1];
+  d.b.forEach((blk, i) => {
+    if (!blk.surprise || autoShown || !get(blk.surprise) || !surpriseReady(openDay, i)) return;
+    let seen = false; try { seen = localStorage.getItem('pc_surprise_seen') === '1'; } catch { }
+    if (!seen) { autoShown = true; openSurprise(); }
+  });
+}
 function renderLetter(n, i, blk) {
   const doc = get(blk.key);
   if (isOwner) {
@@ -374,7 +414,7 @@ function renderDay() {
   const html = d.b.map((blk, i) => {
     let inner = '';
     if (blk.type === 'note') inner = `<div class="note">${esc(get(blk.key)?.text || '…')}<span class="sig">Kevin</span></div>`;
-    else if (blk.type === 'q') inner = renderQ(n, i, blk);
+    else if (blk.type === 'q') inner = renderQ(n, i, blk) + (blk.surprise ? renderSurprise(n, i, blk) : '');
     else if (blk.type === 'choices') inner = renderChoices(n, i, blk, false);
     else if (blk.type === 'vote') inner = renderChoices(n, i, blk, true);
     else if (blk.type === 'truths') inner = renderTruths(n, i, blk);
@@ -392,6 +432,7 @@ function renderDay() {
   for (const id in keep) { const el = document.getElementById(id); if (el) el.value = keep[id]; }
   for (const id in photos) { const pv = document.getElementById('pv' + id); if (pv) { pv.src = photos[id]; pv.hidden = false; } }
   if (active && document.getElementById(active)) document.getElementById(active).focus();
+  autoSurprise();
 }
 
 function route() {
@@ -424,6 +465,13 @@ function compress(file, max = 900, q = .72) {
 const photos = {};
 document.addEventListener('change', async e => {
   const f = e.target; if (f.type !== 'file' || !f.files[0]) return;
+  if (f.dataset.surprise) {
+    const file = f.files[0], err = $('#serr'); err.hidden = true;
+    if (file.size > 4.5e6) { err.hidden = false; err.textContent = 'Fichier trop lourd (4 Mo maximum).'; return; }
+    const data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    pendingSurprise = { name: file.name, type: file.type || 'application/pdf', data: /^data:;base64,/.test(data) ? data.replace('data:;', 'data:application/pdf;') : data };
+    $('#sok').textContent = `Fichier prêt : ${file.name}. Clique sur « Enregistrer la surprise ».`; return;
+  }
   if (f.dataset.asset) { const err = $('#kerr'); err.hidden = true; try { const d = await compress(f.files[0], 900, .75); if (await save(f.dataset.asset, { img: d }, err)) { $('#kok').textContent = 'Photo enregistrée.'; paintHome(); } } catch { err.hidden = false; err.textContent = "Impossible de lire cette photo."; } return; }
   const form = f.closest('form'); const id = `${form.dataset.n}_${form.dataset.i}_${f.dataset.j}`;
   try { photos[id] = await compress(f.files[0]); const pv = document.getElementById('pv' + id); pv.src = photos[id]; pv.hidden = false; } catch { }
@@ -454,6 +502,18 @@ document.addEventListener('submit', async e => {
 document.addEventListener('click', async e => {
   const t = e.target.closest('button,[role=button]'); if (!t) return;
   if (t.id === 'back') { location.hash = ''; return; }
+  if (t.id === 'mclose') { $('#modal').classList.remove('on'); return; }
+  if (t.dataset.surp) { openSurprise(); return; }
+  if (t.dataset.ssave) {
+    const err = $('#serr'); err.hidden = true; let base = pendingSurprise;
+    if (!base && get(t.dataset.ssave)) { try { base = await rpc('pc_surprise', { t: TOKEN }); } catch { } }
+    if (!base?.data) { err.hidden = false; err.textContent = 'Choisis d\'abord le fichier.'; return; }
+    t.setAttribute('disabled', '');
+    const ok = await save(t.dataset.ssave, { name: base.name, type: base.type, data: base.data, msg: $('#smsg').value.trim() }, err);
+    t.removeAttribute('disabled');
+    if (ok) { pendingSurprise = null; R[t.dataset.ssave] = { name: base.name, type: base.type, msg: $('#smsg').value.trim() }; renderDay(); $('#sok').textContent = 'Surprise enregistrée !'; }
+    return;
+  }
   if (t.id === 'news' || t.classList.contains('cell')) { const n = t.dataset.n; if (n) location.hash = 'jour-' + n; return; }
   if (t.dataset.edit) { editState[t.dataset.edit] = true; delete draft[t.dataset.edit]; renderDay(); return; }
   if (t.dataset.pick) { const [n, i, k] = t.dataset.pick.split('_'); const d = draft[`${n}_${i}`] ||= []; const v = t.dataset.v; d[+k] = /^\d+$/.test(v) ? +v : v; renderDay(); return; }

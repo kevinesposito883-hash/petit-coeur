@@ -140,28 +140,30 @@ const DAYS = [
    { type: 'choices', title: "Ceci ou cela", intro: "Choisis vite, sans réfléchir. On verra à quel point on se ressemble.",
      items: [["Plage","Montagne"],["Café","Thé"],["Chien","Chat"],["Lève-tôt","Couche-tard"],["Sucré","Salé"],["Film","Série"],["Pizza","Sushis"],["Grasse mat'","Petit-déj dehors"],["Concert","Soirée canapé"],["Mer","Piscine"]].map(o => ({ opts: o })) } ] },
  { t: "Le portrait chinois", b: [{ type: 'q', intro: "Réponds au premier truc qui te vient.", items: [T("Si tu étais un plat ?"),T("Si tu étais une ville ?"),T("Si tu étais une chanson ?"),T("Si tu étais un animal ?"),T("Si tu étais une saison ?"),T("Si tu étais un objet ?")] }] },
- { t: "Défi photo : premier paysage", b: [{ type: 'q', intro: "Toi tu m'envoies la Martinique, moi je t'envoie Bordeaux. On compare.", items: [P("Ton premier paysage martiniquais","Ma vue de Bordeaux aujourd'hui"),T("Une petite légende ?")] }] },
- { t: "Deux vérités, un mensonge", b: [{ type: 'truths' }] },
- { t: "Mes petites manies", b: [{ type: 'q', intro: "Ici on avoue tout, on ne juge pas (enfin, un peu).", items: [T("Une manie bizarre que tu assumes"),T("Ce que tu fais quand personne ne te regarde"),T("Ton rituel du matin"),T("Ton petit plaisir coupable")] }] },
- { t: "Notre playlist", b: [{ type: 'q', intro: "On commence notre playlist à deux. Elle grandira jusqu'à ton retour.", items: [S("Une chanson importante pour toi (titre et artiste)"),T("Pourquoi elle compte pour toi")] }] },
- { t: "Quand on était petits", b: [{ type: 'q', items: [T("Quelle petite fille tu étais ?","Quel petit garçon j'étais"),T("Ton dessin animé ou jouet préféré"),T("Le métier dont tu rêvais"),T("Une bêtise mémorable"),P("Une photo de toi petite, si tu oses","Une photo de moi petit",true)] }] },
- { t: "Qui de nous deux ?", b: [{ type: 'vote', intro: "Réponds honnêtement. Je réponds de mon côté, et on voit si on est d'accord.",
-   items: ["Qui s'endort en premier devant un film ?","Qui est le plus râleur le matin ?","Qui a craqué en premier ?","Qui cuisine le mieux ?","Qui est le plus têtu ?","Qui pleure devant les films ?","Qui envoie le premier message le matin ?","Qui sera en retard au rendez-vous ?"] }] },
- { t: "Nos premières fois", b: [{ type: 'q', items: [T("Ton premier souvenir de moi"),T("La première chose que tu as remarquée chez moi"),T("Le premier moment où tu t'es dit « oh oh… »"),T("Une première fois qu'on doit absolument vivre ensemble")] }] },
- { t: "Les essentiels", b: [{ type: 'q', items: [T("Ton film refuge"),T("Ton plat réconfort"),T("Ton endroit préféré au monde"),T("L'odeur qui te rend heureuse","L'odeur qui me rend heureux"),T("La série que tu peux revoir dix fois")] }] },
- { t: "Défi photo : un sourire", b: [{ type: 'q', items: [P("Un truc qui t'a fait sourire aujourd'hui","Un truc qui m'a fait sourire aujourd'hui"),T("Raconte")] }] },
- { t: "Rêves et envies", b: [{ type: 'q', items: [T("Le pays où tu rêves d'aller"),T("Un truc que tu veux apprendre un jour"),T("Ton rêve un peu fou"),T("Ta vie idéale dans dix ans")] }] },
- { t: "Ce qui m'a fait craquer", b: [{ type: 'q', items: [T("Ce qui t'a fait craquer chez moi"),T("Le moment où tu as su"),T("Une qualité que j'ai et que je ne vois pas"),S("La chanson qui te fait penser à moi (pour la playlist)")] }] },
+ { t: "Défi photo olé olé", b: [{ type: 'q', intro: "Chacun de son côté, et c'est toi qui choisis jusqu'où tu vas…", items: [P("Une photo de toi qui va me faire regretter de ne pas être là","Une photo de moi qui va te faire regretter de ne pas être là"),T("Une petite légende ?")] }] },
+ { t: "Ceci ou cela, version coquine", b: [{ type: 'choices', title: "Ceci ou cela, version coquine", intro: "Toujours sans réfléchir… mais là, c'est nous deux qu'on imagine.",
+   items: [["Le matin","Le soir"],["Lumière allumée","Lumière éteinte"],["Tendre","Sauvage"],["Prendre son temps","L'urgence"],["Chuchoter","Le dire franchement"],["Mener","Se laisser mener"],["Le lit","Ailleurs"],["Habillé·e qui se déshabille","Déjà nu·e"],["Des préliminaires qui durent","Droit au but"],["Les yeux dans les yeux","Les yeux bandés"],["En silence","Qu'on s'entende"],["Câlin après","Fringale après"]].map(o => ({ opts: o })) }] },
+ { t: "Défi photo : la Martinique", b: [{ type: 'q', intro: "Toi tu m'envoies la Martinique, moi je t'envoie Bordeaux. On compare.", items: [P("Ta première vue de la Martinique","Ma vue de Bordeaux aujourd'hui"),T("Une petite légende ?")] }] },
+ { t: "Deux vérités, un mensonge : spécial nous", b: [{ type: 'truths', intro: "Écris trois phrases sur ce que tu as ressenti ou pensé pendant notre premier mois ensemble : deux vraies, une fausse. Coche la fausse. Ensuite, chacun essaie de démasquer l'autre." }] },
+ { t: "Ce qui est au fond", b: [{ type: 'q', intro: "Une case un peu plus sérieuse. Prends ton temps.", items: [T("Ce dont tu as besoin pour te sentir aimée","Ce dont j'ai besoin pour me sentir aimé"),T("Ce qui te fait peur en amour"),T("Une chose de ton passé que tu veux que je connaisse"),T("Ce que tu ressens quand tu penses à nous")] }] },
+ { t: "Les pronostics", b: [{ type: 'vote', intro: "On ne juge pas le passé, on parie sur la suite ! Je fais mes pronostics de mon côté.",
+   items: ["Qui va pleurer à la gare le 7 ?","Qui va parler d'emménager ensemble en premier ?","Qui va présenter l'autre à sa famille en premier ?","Qui va oublier un anniversaire de couple ?","Qui va dire « je t'aime » le plus souvent cette année ?","Qui va faire la première crise de jalousie ?","Qui va proposer le premier voyage à deux ?","Qui va courir le premier vers l'autre sur le quai ?"] }] },
+ { t: "Le jeu des envies", b: [{ type: 'envies', intro: "Réponds oui, non ou peut-être à chaque envie. À la fin, seules celles où on est partants tous les deux s'affichent. Les « non » ne sont jamais montrés, promis.",
+   items: ["Un bain à deux, bougies allumées","Un massage à l'huile, sans limite de temps","Un week-end entier sans sortir du lit","Une douche à deux","Une nuit à l'hôtel, juste pour ça","Des messages coquins en pleine journée, pendant que l'autre travaille","Une tenue choisie par l'autre","Les yeux bandés","Ailleurs que dans la chambre","Un strip-tease","Un jeu de rôle","Se laisser attacher, tout doucement","Tester un jouet à deux","Un endroit où on pourrait se faire surprendre"] }] },
+ { t: "Défi photo coquin", b: [{ type: 'q', intro: "Chacun choisit jusqu'où il va…", items: [P("Une photo qui me donne envie de te retrouver","Une photo qui te donne envie de me retrouver"),T("Une petite légende ?")] }] },
+ { t: "Ce qui me fait du bien", b: [{ type: 'q', items: [T("Comment tu aimes qu'on te montre de l'amour"),T("Le petit geste qui te fait fondre"),T("Ce que je fais qui te rassure"),T("Ce que tu aimerais que je fasse plus souvent")] }] },
+ { t: "Nos secrets d'alcôve", b: [{ type: 'q', intro: "Rien que pour nous deux…", items: [T("Ton souvenir le plus chaud de nous"),T("Ce que tu préfères chez moi physiquement"),T("Un endroit où tu aimerais qu'on…"),T("Une envie que tu n'as jamais osé me dire")] }] },
+ { t: "Notre playlist", b: [{ type: 'q', intro: "On construit notre playlist à deux.", items: [S("La chanson qui te fait penser à nous (titre et artiste)"),T("Pourquoi celle-là ?"),S("La chanson pour nos retrouvailles")] }] },
  { t: "Tu me connais maintenant ?", b: [{ type: 'quiz', intro: "Tout ce qu'on s'est dit depuis ton départ… Voyons ce que tu as retenu sur {o}.",
-   items: [{ q: "Si {o} était une ville", ref: [2,0,1] },{ q: "Le plat réconfort de {o}", ref: [10,0,1] },{ q: "Le pays où {o} rêve d'aller", ref: [12,0,0] },{ q: "Le métier dont {o} rêvait petit·e", ref: [7,0,2] },{ q: "Le petit plaisir coupable de {o}", ref: [5,0,3] },{ q: "Le film refuge de {o}", ref: [10,0,0] }] }] },
- { t: "Nos projets", b: [{ type: 'q', intro: "On se projette, sans retenue.", items: [T("Un voyage à faire à deux"),T("Un truc à faire ensemble cet hiver"),T("Où on sera dans un an"),T("Une tradition qu'on va créer"),T("La première chose qu'on fait à mon retour","La première chose qu'on fait à ton retour")] }] },
+   items: [{ q: "Si {o} était une ville", ref: [2,0,1] },{ q: "Si {o} était une chanson", ref: [2,0,2] },{ q: "Ce dont {o} a besoin pour se sentir aimé·e", ref: [7,0,0] },{ q: "Le petit geste qui fait fondre {o}", ref: [11,0,1] },{ q: "Ce que {o} préfère chez toi physiquement", ref: [12,0,1] },{ q: "La chanson de nos retrouvailles selon {o}", ref: [13,0,2] }] }] },
+ { t: "Nos projets", b: [{ type: 'q', intro: "On se projette, sans retenue.", items: [T("Un voyage à faire à deux"),T("Vivre ensemble : quand, où, comment ?"),T("Où on sera dans un an"),T("Une tradition qu'on va créer"),T("La première chose qu'on fait à mon retour","La première chose qu'on fait à ton retour")] }] },
  { t: "Une lettre pour toi", b: [{ type: 'letter', key: 'd16letter' }, { type: 'q', only: 'awen', title: "Ta réponse", items: [T("Écris-moi ce que tu veux")] }] },
- { t: "Dernier coucher de soleil", b: [
-   { type: 'q', items: [P("Ton dernier coucher de soleil là-bas","Le ciel de Bordeaux ce soir"),T("Un mot ?")] },
+ { t: "Un moment marquant", b: [
+   { type: 'q', items: [P("Un moment marquant de tes vacances","Un moment marquant de mes trois semaines sans toi"),T("Raconte-moi")] },
    { type: 'choices', title: "Notre futur : vrai ou faux ?", intro: "Chacun répond de son côté.",
-     items: ["On partira en voyage ensemble l'été prochain","On aura un animal ensemble","On passera le Nouvel An ensemble","On vivra ensemble un jour","On ira en Martinique tous les deux"].map(q => ({ q, opts: ["Vrai","Faux"] })) } ] },
- { t: "La veille du retour", b: [{ type: 'recap' }, { type: 'q', items: [T("Ce que tu as préféré dans ces trois semaines")] }] },
- { t: "Le jour des retrouvailles", b: [{ type: 'letter', key: 'd19letter' }, { type: 'coupons', items: ["Un massage","Un petit-déj au lit","Tu choisis le film, sans discuter","Une soirée surprise organisée par moi","Un resto de ton choix","Des câlins illimités"] }] }
+     items: ["On vivra ensemble avant fin 2027","On partira en voyage à deux l'été prochain","On passera le Nouvel An ensemble","On se mariera","On aura des enfants","On reviendra en Martinique tous les deux"].map(q => ({ q, opts: ["Vrai","Faux"] })) } ] },
+ { t: "La veille du retour", b: [{ type: 'recap' }, { type: 'q', title: "Le programme de nos retrouvailles", items: [T("La première heure…"),T("La première nuit…"),T("Ce que tu as préféré dans ces trois semaines")] }] },
+ { t: "Le jour des retrouvailles", b: [{ type: 'letter', key: 'd19letter' }, { type: 'coupons', items: ["Un massage","Un petit-déj au lit","Tu choisis le film, sans discuter","Une soirée surprise organisée par moi","Un resto de ton choix","Des câlins illimités","Une nuit où c'est toi qui décides de tout","Un massage qui dérape","Un réveil très spécial"] }] }
 ];
 const NAMES = { kevin: 'Kevin', awen: 'Awen' };
 let me = 'awen', other = 'kevin', isOwner = false;
@@ -283,10 +285,10 @@ function renderChoices(n, i, blk, isVote) {
   return head + score + rows + `<button class="btn ghost" data-edit="${n}_${i}">Modifier mes choix</button>`;
 }
 
-function renderTruths(n, i) {
+function renderTruths(n, i, blk) {
   const mine = get(key(n, i, me)), theirs = get(key(n, i, other));
   const myGuess = get(key(n, i, 'g' + me)), theirGuess = get(key(n, i, 'g' + other));
-  let h = `<h3>Deux vérités, un mensonge</h3><p class="intro">Écris trois choses sur toi : deux vraies, une fausse. Coche le mensonge. Ensuite, chacun essaie de démasquer l'autre.</p>`;
+  let h = `<h3>Deux vérités, un mensonge</h3><p class="intro">${esc(blk?.intro || "Écris trois choses sur toi : deux vraies, une fausse. Coche le mensonge. Ensuite, chacun essaie de démasquer l'autre.")}</p>`;
   if (!mine || editState[`${n}_${i}`]) {
     h += `<form data-form="truths" data-n="${n}" data-i="${i}">` + [0,1,2].map(j => `<label class="q" for="tr${j}">Affirmation ${j + 1}</label><textarea id="tr${j}" rows="2">${esc(mine?.a?.s?.[j] || '')}</textarea><label style="display:flex;gap:8px;align-items:center;margin-top:6px;min-height:44px"><input type="radio" name="lie" value="${j}" ${mine?.a?.lie === j ? 'checked' : ''}> C'est le mensonge</label>`).join('') + `<button class="btn" type="submit">Envoyer</button><div class="err" hidden></div></form>`;
   } else {
@@ -311,6 +313,25 @@ function renderQuiz(n, i, blk) {
   h += `<label class="q" style="margin-top:22px">Et ${NAMES[other]}, que sait-il${other === 'awen' ? ' ou elle' : ''} de toi ?</label>`;
   h += theirs ? blk.items.map((it, j) => `<div class="duo"><div><span class="who">${NAMES[other]} pense</span>${esc(theirs.a[j] || '—')}</div><div><span class="who">Ta vraie réponse</span>${esc(real(me, it.ref) || '—')}</div></div>`).join('') : `<div class="wait">${NAMES[other]} n'a pas encore joué.</div>`;
   return h;
+}
+
+function renderEnvies(n, i, blk) {
+  const mine = get(key(n, i, me)), theirs = get(key(n, i, other));
+  let h = `<h3>Le jeu des envies</h3><p class="intro">${esc(blk.intro)}</p>`;
+  const L = { o: 'Oui', p: 'Peut-être', n: 'Non' };
+  if (!mine || editState[`${n}_${i}`]) {
+    const cur = draft[`${n}_${i}`] ||= (mine?.a ? [...mine.a] : []);
+    h += `<div class="pairs">` + blk.items.map((it, k) => `<div class="pair" style="grid-template-columns:repeat(3,1fr)"><div class="qq">${esc(it)}</div>${['o','p','n'].map(v => `<button class="opt ${cur[k] === v ? 'sel' : ''}" data-pick="${n}_${i}_${k}" data-v="${v}">${L[v]}</button>`).join('')}</div>`).join('') + `</div>`;
+    return h + `<button class="btn" data-sendc="${n}_${i}" ${cur.filter(Boolean).length < blk.items.length ? 'disabled' : ''}>Envoyer mes envies</button><div class="err" hidden></div>`
+      + (theirs && !mine ? `<div class="wait">${NAMES[other]} a déjà répondu. À toi pour découvrir vos envies communes !</div>` : '');
+  }
+  if (!theirs) return h + `<div class="wait">Tes envies sont envoyées. Vos envies communes apparaîtront dès que ${NAMES[other]} aura répondu.</div><button class="btn ghost" data-edit="${n}_${i}">Modifier mes réponses</button>`;
+  const yes = [], maybe = [];
+  blk.items.forEach((it, k) => { const a = mine.a[k], b = theirs.a[k]; if (a === 'o' && b === 'o') yes.push(it); else if (a !== 'n' && b !== 'n') maybe.push(it); });
+  h += `<div class="score">${yes.length}</div><p class="intro">envie${yes.length > 1 ? 's' : ''} partagée${yes.length > 1 ? 's' : ''} à 100 %</p>`;
+  h += yes.length ? `<ul class="list">${yes.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  h += `<label class="q" style="margin-top:18px">À en discuter…</label>` + (maybe.length ? `<ul class="list">${maybe.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="intro">Rien ici.</p>');
+  return h + `<button class="btn ghost" data-edit="${n}_${i}">Modifier mes réponses</button>`;
 }
 
 function renderLetter(n, i, blk) {
@@ -356,7 +377,8 @@ function renderDay() {
     else if (blk.type === 'q') inner = renderQ(n, i, blk);
     else if (blk.type === 'choices') inner = renderChoices(n, i, blk, false);
     else if (blk.type === 'vote') inner = renderChoices(n, i, blk, true);
-    else if (blk.type === 'truths') inner = renderTruths(n, i);
+    else if (blk.type === 'truths') inner = renderTruths(n, i, blk);
+    else if (blk.type === 'envies') inner = renderEnvies(n, i, blk);
     else if (blk.type === 'quiz') inner = renderQuiz(n, i, blk);
     else if (blk.type === 'letter') inner = renderLetter(n, i, blk);
     else if (blk.type === 'recap') inner = renderRecap();

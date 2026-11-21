@@ -208,7 +208,7 @@ const DAYS = [
  { t: "Le jour des retrouvailles", b: [{ type: 'letter', key: 'd19letter' }, { type: 'coupons', items: ["Un massage","Un petit-déj au lit","Tu choisis le film, sans discuter","Une soirée surprise organisée par moi","Un resto de ton choix","Des câlins illimités","Une nuit où c'est toi qui décides de tout","Un massage qui dérape","Un réveil très spécial"] }] }
 ];
 const EXTRA = {
-  4: { type: 'wheel', title: 'La roue des défis coquine', intro: "Fais tourner la roue une seule fois… et relève ton défi !", items: ["Décris-moi ta tenue, là, maintenant", "Dis-moi les 3 endroits de mon corps que tu préfères", "Raconte-moi le moment où tu as eu le plus envie de moi", "Écris le texto que tu m'enverrais si j'étais dans la pièce d'à côté", "Décris notre prochain baiser en 3 phrases", "Choisis la tenue que je porterai le 7", "Dis-moi ce que tu me chuchoterais à l'oreille ce soir", "Avoue un rêve que tu as fait de moi"] },
+  4: { type: 'wheel', title: 'La roue des défis coquine', intro: "Fais tourner la roue une seule fois : ton défi sera à relever quand on se retrouvera !", items: ["Un massage de 20 minutes, sans rien demander en retour", "Une douche à deux, dès le premier soir", "Un slow dans le salon, lumières éteintes, sur la chanson de ton choix", "Un petit-déj au lit… qui s'éternise", "Une soirée où l'autre a le droit de tout décider", "Un bain moussant à deux, bougies allumées", "Une nuit sans téléphone, rien que nous deux", "Les yeux bandés, l'autre mène la danse"] },
   5: { type: 'map' },
   6: { type: 'hangman' },
   7: { type: 'scratch' },
@@ -489,8 +489,8 @@ const GAMES = {
     }
     const d = blk.items[mine.a.idx];
     h += `<div class="wait">Ton défi : ${esc(d)}</div>`;
-    if (!mine.a.txt || editState[`w${n}_${i}`]) return h + `<label class="q" for="wt${n}_${i}">Relève ton défi</label><textarea id="wt${n}_${i}" rows="4">${esc(mine.a.txt || '')}</textarea><button class="btn" data-g="wsave" data-k="${n}_${i}">Envoyer</button>`;
-    h += `<div class="duo"><div><span class="who">Toi</span>${esc(mine.a.txt)}</div><div><span class="who">${NAMES[other]}${theirs ? ' · ' + esc(blk.items[theirs.a.idx]) : ''}</span>${theirs?.a?.txt ? (esc(theirs.a.txt)) : '<em>en attente…</em>'}</div></div>`;
+    if (!mine.a.ok || editState[`w${n}_${i}`]) return h + `<label class="q" for="wt${n}_${i}">Un petit mot ? (facultatif)</label><textarea id="wt${n}_${i}" rows="3">${esc(mine.a.txt || '')}</textarea><button class="btn" data-g="wsave" data-k="${n}_${i}">Promis !</button>`;
+    h += `<div class="duo"><div><span class="who">Ton défi</span>${esc(d)}${mine.a.txt ? `<br><em>${esc(mine.a.txt)}</em>` : ''}</div><div><span class="who">Le défi de ${NAMES[other]}</span>${theirs?.a?.ok ? esc(blk.items[theirs.a.idx]) + (theirs.a.txt ? `<br><em>${esc(theirs.a.txt)}</em>` : '') : '<em>en attente…</em>'}</div></div><p class="intro" style="margin-top:10px">Promis, on les relève à partir du 7 décembre !</p>`;
     return h;
   },
   map(n, i) {
@@ -615,6 +615,12 @@ async function drawMap(k, edit) {
   } catch (e) { box.innerHTML = '<p class="intro">La carte ne charge pas… vérifie ta connexion.</p>'; }
 }
 function keepNames(k) { (GS[k]?.pins || []).forEach((p, j) => { const el = document.getElementById(`pn${k}_${j}`); if (el) p.name = el.value; }); }
+function renderPromises() {
+  const w = DAYS[3].b.findIndex(b => b.type === 'wheel'); if (w < 0) return '';
+  const items = DAYS[3].b[w].items, ds = ['kevin', 'awen'].map(p => get(key(4, w, p))).filter(d => d?.a?.ok);
+  if (!ds.length) return '';
+  return `<h3>Nos défis promis</h3><p class="intro">Tirés à la roue le 22 novembre… c'est le moment !</p><ul class="list">${ds.map(d => `<li>${esc(items[d.a.idx])}</li>`).join('')}</ul><div style="height:18px"></div>`;
+}
 let kissTimer = null;
 const GAMEACT = {
   async spin(t) {
@@ -625,7 +631,7 @@ const GAMEACT = {
     await new Promise(r => setTimeout(r, 3800)); busyGame = false;
     await save(key(n, i, me), { a: { idx } }, null); renderDay(); renderGrid();
   },
-  async wsave(t) { const [n, i] = t.dataset.k.split('_').map(Number), m = get(key(n, i, me)); const txt = document.getElementById(`wt${n}_${i}`).value.trim(); if (!txt) return; if (await save(key(n, i, me), { a: { idx: m.a.idx, txt } }, null)) { delete editState[`w${n}_${i}`]; renderDay(); } },
+  async wsave(t) { const [n, i] = t.dataset.k.split('_').map(Number), m = get(key(n, i, me)); const txt = document.getElementById(`wt${n}_${i}`).value.trim(); if (await save(key(n, i, me), { a: { idx: m.a.idx, txt, ok: true } }, null)) { delete editState[`w${n}_${i}`]; renderDay(); } },
   mapclear(t) { GS[t.dataset.k].pins = []; renderDay(); },
   mapedit(t) { editState['m' + t.dataset.k] = true; renderDay(); },
   async mapsave(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number); keepNames(k); const pins = GS[k].pins.map((p, j) => ({ ...p, name: p.name.trim() || 'Épingle ' + (j + 1) })); if (await save(key(n, i, me), { a: pins }, null)) { delete editState['m' + k]; renderDay(); renderGrid(); } },
@@ -765,7 +771,7 @@ function renderDay() {
     else if (blk.type === 'quiz') inner = renderQuiz(n, i, blk);
     else if (blk.type === 'letter') inner = renderLetter(n, i, blk);
     else if (blk.type === 'recap') inner = renderRecap();
-    else if (blk.type === 'coupons') inner = renderCoupons(n, i, blk);
+    else if (blk.type === 'coupons') inner = renderPromises() + renderCoupons(n, i, blk);
     return `<div class="block">${inner}</div>`;
   }).join('');
   const active = document.activeElement?.id;

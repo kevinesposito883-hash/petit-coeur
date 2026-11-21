@@ -103,6 +103,12 @@ footer{color:var(--soft);font-size:13px;text-align:center;margin-top:40px}
 .modal iframe{width:100%;height:55vh;border:0;border-radius:12px;background:#fff;margin-top:12px}
 .modal img{max-width:100%;border-radius:12px;margin-top:12px}
 .gift{width:84px;height:84px;margin:0 auto 8px;display:block}
+.draw canvas{width:100%;aspect-ratio:4/3;background:#fff;border:2px solid var(--line);border-radius:14px;touch-action:none;display:block}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.sw{all:unset;cursor:pointer;width:34px;height:34px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px var(--line)}
+.sw.sel{border-color:var(--ink)}
+.tl{all:unset;cursor:pointer;padding:6px 12px;min-height:34px;border-radius:999px;border:2px solid var(--line);font-weight:700;font-size:14px;display:inline-flex;align-items:center}
+.tl.sel{background:var(--sea);border-color:var(--sea);color:#fff}
 @media(max-width:600px){.hero{grid-template-columns:minmax(0,1fr) 112px;padding:18px}.duo:not(.tight){grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
@@ -141,6 +147,8 @@ footer{color:var(--soft);font-size:13px;text-align:center;margin-top:40px}
 const T = (q, qk) => ({ kind: 'text', q, qk });
 const P = (q, qk, optional) => ({ kind: 'photo', q, qk, optional });
 const S = (q, qk) => ({ kind: 'song', q, qk });
+const D = (q, qk) => ({ kind: 'draw', q, qk });
+const isPic = k => k === 'photo' || k === 'draw';
 const DAYS = [
  { t: "Bon voyage, petit cœur", b: [
    { type: 'note', key: 'note1' },
@@ -157,13 +165,13 @@ const DAYS = [
    items: ["Qui va pleurer à la gare le 7 ?","Qui va parler d'emménager ensemble en premier ?","Qui va présenter l'autre à sa famille en premier ?","Qui va oublier un anniversaire de couple ?","Qui va dire « je t'aime » le plus souvent cette année ?","Qui va faire la première crise de jalousie ?","Qui va proposer le premier voyage à deux ?","Qui va courir le premier vers l'autre sur le quai ?"] }] },
  { t: "Le jeu des envies", b: [{ type: 'envies', intro: "Réponds oui, non ou peut-être à chaque envie. À la fin, seules celles où on est partants tous les deux s'affichent. Les « non » ne sont jamais montrés, promis.",
    items: ["Un bain à deux, bougies allumées","Un massage à l'huile, sans limite de temps","Un week-end entier sans sortir du lit","Une douche à deux","Une nuit à l'hôtel, juste pour ça","Des messages coquins en pleine journée, pendant que l'autre travaille","Une tenue choisie par l'autre","Les yeux bandés","Ailleurs que dans la chambre","Un strip-tease","Un jeu de rôle","Se laisser attacher, tout doucement","Tester un jouet à deux","Un endroit où on pourrait se faire surprendre"] }] },
- { t: "Défi photo coquin", b: [{ type: 'q', intro: "Chacun choisit jusqu'où il va…", items: [P("Une photo qui me donne envie de te retrouver","Une photo qui te donne envie de me retrouver"),T("Une petite légende ?")] }] },
+ { t: "Défi photo coquin", b: [{ type: 'q', intro: "Chacun choisit jusqu'où il va…", items: [P("Une photo qui me donne envie de te retrouver","Une photo qui te donne envie de me retrouver"),T("Une petite légende ?"),T("Décris-moi avec précision ce que tu voudrais qu'on fasse si on était dans un lit, là, maintenant, tout de suite")] }] },
  { t: "Ce qui me fait du bien", b: [{ type: 'q', items: [T("Comment tu aimes qu'on te montre de l'amour"),T("Le petit geste qui te fait fondre"),T("Ce que je fais qui te rassure"),T("Ce que tu aimerais que je fasse plus souvent")] }] },
  { t: "Nos secrets d'alcôve", b: [{ type: 'q', intro: "Rien que pour nous deux…", items: [T("Ton souvenir le plus chaud de nous"),T("Ce que tu préfères chez moi physiquement"),T("Un endroit où tu aimerais qu'on…"),T("Une envie que tu n'as jamais osé me dire")] }] },
  { t: "Notre playlist", b: [{ type: 'q', intro: "On construit notre playlist à deux.", items: [S("La chanson qui te fait penser à nous (titre et artiste)"),T("Pourquoi celle-là ?"),S("La chanson pour nos retrouvailles")] }] },
  { t: "Tu me connais maintenant ?", b: [{ type: 'quiz', intro: "Tout ce qu'on s'est dit depuis ton départ… Voyons ce que tu as retenu sur {o}.",
    items: [{ q: "Si {o} était une ville", ref: [2,0,1] },{ q: "Si {o} était une chanson", ref: [2,0,2] },{ q: "Ce dont {o} a besoin pour se sentir aimé·e", ref: [7,0,0] },{ q: "Le petit geste qui fait fondre {o}", ref: [11,0,1] },{ q: "Ce que {o} préfère chez toi physiquement", ref: [12,0,1] },{ q: "La chanson de nos retrouvailles selon {o}", ref: [13,0,2] }] }] },
- { t: "Nos projets", b: [{ type: 'q', intro: "On se projette, sans retenue.", items: [T("Un voyage à faire à deux"),T("Vivre ensemble : quand, où, comment ?"),T("Où on sera dans un an"),T("Une tradition qu'on va créer"),T("La première chose qu'on fait à mon retour","La première chose qu'on fait à ton retour")] }] },
+ { t: "Nos projets", b: [{ type: 'q', intro: "On se projette, sans retenue.", items: [T("Un voyage à faire à deux"),T("Vivre ensemble : quand, où, comment ?"),D("Dessine-moi la première chose qui te passe par la tête quand tu penses à notre futur"),T("Une tradition qu'on va créer"),T("La première chose qu'on fait à mon retour","La première chose qu'on fait à ton retour")] }] },
  { t: "Une lettre pour toi", b: [{ type: 'letter', key: 'd16letter' }, { type: 'q', only: 'awen', title: "Ta réponse", items: [T("Écris-moi ce que tu veux")] }] },
  { t: "Un moment marquant", b: [
    { type: 'q', items: [P("Un moment marquant de tes vacances","Un moment marquant de mes trois semaines sans toi"),T("Raconte-moi")] },
@@ -251,18 +259,19 @@ function renderQ(n, i, blk) {
   const editing = editState[`${n}_${i}`];
   const head = (blk.title ? `<h3>${esc(blk.title)}</h3>` : '') + (blk.intro ? `<p class="intro">${esc(blk.intro)}</p>` : '');
   if (blk.only && blk.only !== me) {
-    return head + (theirDoc ? blk.items.map((it, j) => `<div class="solo"><label class="q">${esc(it.q)}</label><div class="duo" style="grid-template-columns:1fr"><div>${it.kind === 'photo' ? img(theirDoc.a?.[j]) : esc(theirDoc.a?.[j])}</div></div></div>`).join('') : `<div class="wait">${NAMES[other]} n'a pas encore répondu.</div>`);
+    return head + (theirDoc ? blk.items.map((it, j) => `<div class="solo"><label class="q">${esc(it.q)}</label><div class="duo" style="grid-template-columns:1fr"><div>${isPic(it.kind) ? img(theirDoc.a?.[j]) : esc(theirDoc.a?.[j])}</div></div></div>`).join('') : `<div class="wait">${NAMES[other]} n'a pas encore répondu.</div>`);
   }
   if (!mineDoc || editing) {
     return head + `<form data-form="q" data-n="${n}" data-i="${i}">` + blk.items.map((it, j) => {
       const v = mineDoc?.a?.[j] ?? '';
+      if (it.kind === 'draw') return `<label class="q">${esc(qt(it))}</label><div class="draw"><canvas id="cv${n}_${i}_${j}" width="800" height="600" data-cv="${n}_${i}_${j}" data-init="${img(v) ? 'old' : ''}"></canvas><div class="tools">${DCOLS.map(c => `<button type="button" class="sw ${dstate.color === c && !dstate.erase ? 'sel' : ''}" style="background:${c}" data-dcol="${c}" aria-label="Couleur"></button>`).join('')}<button type="button" class="tl ${dstate.size === 5 ? 'sel' : ''}" data-dsize="5">Fin</button><button type="button" class="tl ${dstate.size === 14 ? 'sel' : ''}" data-dsize="14">Épais</button><button type="button" class="tl ${dstate.erase ? 'sel' : ''}" data-derase="1">Gomme</button><button type="button" class="tl" data-dclear="${n}_${i}_${j}">Recommencer</button></div></div>`;
       if (it.kind === 'photo') return `<label class="q" for="f${n}_${i}_${j}">${esc(qt(it))}${it.optional ? ' (facultatif)' : ''}</label><input class="file" type="file" accept="image/*" id="f${n}_${i}_${j}" data-j="${j}">${img(v) ? `<img class="pv" id="pv${n}_${i}_${j}" src="${v}" alt="">` : `<img class="pv" id="pv${n}_${i}_${j}" hidden alt="">`}`;
       return `<label class="q" for="t${n}_${i}_${j}">${esc(qt(it))}</label><textarea id="t${n}_${i}_${j}" rows="${blk.only ? 8 : 2}" data-j="${j}">${esc(v)}</textarea>`;
     }).join('') + `<button class="btn" type="submit">${mineDoc ? 'Enregistrer' : 'Envoyer ma réponse'}</button><div class="err" hidden></div></form>`
       + (theirDoc && !mineDoc ? `<div class="wait">${NAMES[other]} a déjà répondu. Réponds pour découvrir ses réponses.</div>` : '');
   }
   const out = blk.items.map((it, j) => {
-    const cell = (doc, w) => `<div><span class="who">${whoLbl(w)}</span>${it.kind === 'photo' ? (img(doc?.a?.[j]) || '<em>pas de photo</em>') : esc(doc?.a?.[j] || '—')}</div>`;
+    const cell = (doc, w) => `<div><span class="who">${whoLbl(w)}</span>${isPic(it.kind) ? (img(doc?.a?.[j]) || '<em>pas de photo</em>') : esc(doc?.a?.[j] || '—')}</div>`;
     return `<label class="q">${esc(qt(it))}</label><div class="duo">${cell(mineDoc, me)}${theirDoc ? cell(theirDoc, other) : `<div><span class="who">${NAMES[other]}</span><em>en attente…</em></div>`}</div>`;
   }).join('');
   return head + out + (theirDoc ? '' : `<div class="wait">Ta réponse est envoyée. Tu découvriras celle de ${NAMES[other]} dès qu'il${other === 'awen' ? ' ou elle' : ''} aura répondu.</div>`)
@@ -341,6 +350,26 @@ function renderEnvies(n, i, blk) {
   return h + `<button class="btn ghost" data-edit="${n}_${i}">Modifier mes réponses</button>`;
 }
 
+const DCOLS = ['#3a1430', '#ff5a4e', '#12a4a0', '#f7b32b', '#7b4bd6', '#ff8fb1'];
+const dstate = { color: '#3a1430', size: 5, erase: false };
+function initCanvases(prevDocs) {
+  document.querySelectorAll('canvas[data-cv]').forEach(cv => {
+    const id = cv.dataset.cv, g = cv.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+    const [n, i, j] = id.split('_').map(Number);
+    const src = photos[id] || get(key(n, i, me))?.a?.[j];
+    if (src && img(src)) { const im = new Image(); im.onload = () => g.drawImage(im, 0, 0, cv.width, cv.height); im.src = src; }
+    let drawing = false, last = null;
+    const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; };
+    cv.addEventListener('pointerdown', e => { drawing = true; last = pt(e); cv.setPointerCapture(e.pointerId); dot(last); });
+    cv.addEventListener('pointermove', e => { if (!drawing) return; const p = pt(e); line(last, p); last = p; });
+    const end = () => { if (!drawing) return; drawing = false; photos[id] = cv.toDataURL('image/jpeg', .85); };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+    function style() { g.strokeStyle = g.fillStyle = dstate.erase ? '#fff' : dstate.color; g.lineWidth = dstate.erase ? 28 : dstate.size; g.lineCap = g.lineJoin = 'round'; }
+    function dot(p) { style(); g.beginPath(); g.arc(p[0], p[1], g.lineWidth / 2, 0, Math.PI * 2); g.fill(); }
+    function line(a, b) { style(); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+  });
+}
 let pendingSurprise = null, autoShown = false;
 const GIFT = '<svg class="gift" viewBox="0 0 64 64"><rect x="8" y="26" width="48" height="32" rx="4" fill="#ff5a4e"/><rect x="4" y="18" width="56" height="12" rx="3" fill="#4a1d3a"/><rect x="28" y="18" width="8" height="40" fill="#12a4a0"/><path d="M32 18c-6-12-20-10-14 0zM32 18c6-12 20-10 14 0z" fill="#12a4a0"/></svg>';
 function surpriseReady(n, i) { return !!(get(key(n, i, 'kevin')) && get(key(n, i, 'awen'))); }
@@ -387,7 +416,7 @@ function renderRecap() {
   DAYS.forEach((d, k) => d.b.forEach((b, i) => { if (b.type !== 'q') return; b.items.forEach((it, j) => {
     ['kevin','awen'].forEach(w => { const v = get(key(k + 1, i, w))?.a?.[j]; if (!v) return;
       if (it.kind === 'song') songs.push(`${esc(v)} <span class="miss">(${NAMES[w]})</span>`);
-      if (k + 1 === 15) projets.push(`${esc(v)} <span class="miss">(${NAMES[w]})</span>`); });
+      if (k + 1 === 15 && it.kind === 'text') projets.push(`${esc(v)} <span class="miss">(${NAMES[w]})</span>`); });
   }); }));
   const agree = [[1,1],[17,1]].map(([n, i]) => { const a = get(key(n, i, 'kevin'))?.a, b = get(key(n, i, 'awen'))?.a; if (!a || !b) return null; return Math.round(a.filter((v, x) => v === b[x]).length / a.length * 100); });
   const answered = DAYS.reduce((s, d, k) => s + d.b.filter((b, i) => get(key(k + 1, i, 'kevin')) && get(key(k + 1, i, 'awen'))).length, 0);
@@ -432,6 +461,7 @@ function renderDay() {
   for (const id in keep) { const el = document.getElementById(id); if (el) el.value = keep[id]; }
   for (const id in photos) { const pv = document.getElementById('pv' + id); if (pv) { pv.src = photos[id]; pv.hidden = false; } }
   if (active && document.getElementById(active)) document.getElementById(active).focus();
+  initCanvases();
   autoSurprise();
 }
 
@@ -491,7 +521,7 @@ document.addEventListener('submit', async e => {
   }
   const prev = get(key(n, i, me))?.a || [];
   const a = blk.items.map((it, j) => {
-    if (it.kind === 'photo') return photos[`${n}_${i}_${j}`] || prev[j] || '';
+    if (isPic(it.kind)) return photos[`${n}_${i}_${j}`] || prev[j] || '';
     const el = form.querySelector(`[data-j="${j}"]`); return el ? el.value.trim() : '';
   });
   const missing = blk.items.some((it, j) => !it.optional && !a[j]);
@@ -503,6 +533,10 @@ document.addEventListener('click', async e => {
   const t = e.target.closest('button,[role=button]'); if (!t) return;
   if (t.id === 'back') { location.hash = ''; return; }
   if (t.id === 'mclose') { $('#modal').classList.remove('on'); return; }
+  if (t.dataset.dcol) { dstate.color = t.dataset.dcol; dstate.erase = false; t.closest('.tools').querySelectorAll('.sw,[data-derase]').forEach(b => b.classList.toggle('sel', b === t)); return; }
+  if (t.dataset.dsize) { dstate.size = +t.dataset.dsize; dstate.erase = false; t.closest('.tools').querySelectorAll('[data-dsize],[data-derase]').forEach(b => b.classList.toggle('sel', b === t)); return; }
+  if (t.dataset.derase) { dstate.erase = true; t.closest('.tools').querySelectorAll('.sw,[data-derase]').forEach(b => b.classList.toggle('sel', b === t)); return; }
+  if (t.dataset.dclear) { const cv = document.getElementById('cv' + t.dataset.dclear); const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); delete photos[t.dataset.dclear]; return; }
   if (t.dataset.surp) { openSurprise(); return; }
   if (t.dataset.ssave) {
     const err = $('#serr'); err.hidden = true; let base = pendingSurprise;

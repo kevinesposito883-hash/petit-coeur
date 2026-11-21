@@ -109,6 +109,33 @@ footer{color:var(--soft);font-size:13px;text-align:center;margin-top:40px}
 .sw.sel{border-color:var(--ink)}
 .tl{all:unset;cursor:pointer;padding:6px 12px;min-height:34px;border-radius:999px;border:2px solid var(--line);font-weight:700;font-size:14px;display:inline-flex;align-items:center}
 .tl.sel{background:var(--sea);border-color:var(--sea);color:#fff}
+.sub{border-top:2px dashed var(--line);margin-top:22px;padding-top:6px}
+.wheel{position:relative;max-width:300px;margin:10px auto}
+.wheel svg{width:100%;display:block;transform-origin:50% 50%}
+.wheel .pin{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--ink)}
+.hm{font:600 26px Fredoka,sans-serif;letter-spacing:4px;text-align:center;margin:14px 0;overflow-wrap:anywhere}
+.keys{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.keys button{all:unset;cursor:pointer;text-align:center;padding:8px 0;border-radius:10px;border:2px solid var(--line);font-weight:700}
+.keys button[disabled]{opacity:.3}
+.scr{position:relative;border-radius:16px;overflow:hidden;min-height:120px}
+.scr-in{padding:16px}
+.scr canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;transition:opacity .6s}
+.bar{height:14px;border-radius:7px;background:var(--line);overflow:hidden;margin:4px 0 8px}
+.bar i{display:block;height:100%;background:var(--coral)}
+.bar.o i{background:var(--sea)}
+input[type=range]{width:100%;accent-color:var(--coral);height:32px}
+.pz{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:330px;margin:10px auto}
+.pz button{all:unset;cursor:pointer;aspect-ratio:1;background-size:300% 300%;border-radius:6px;outline:3px solid transparent}
+.pz button.sel{outline-color:var(--sea)}
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.mem button{all:unset;cursor:pointer;aspect-ratio:1;border-radius:12px;background:var(--plum);background-size:cover;background-position:center}
+.mem button.up{background-color:#fff}
+.mem button.ok{opacity:.55}
+.map svg{width:100%;display:block;background:color-mix(in srgb,var(--sea) 18%,transparent);border-radius:14px;touch-action:manipulation}
+.kiss{all:unset;cursor:pointer;display:block;margin:10px auto;width:150px;height:150px}
+.kiss:active{transform:scale(.94)}
+.big{font-family:Fredoka;font-size:clamp(48px,14vw,72px);color:var(--coral);text-align:center;line-height:1}
+.game{width:100%;max-width:360px;aspect-ratio:3/4;display:block;margin:10px auto;background:color-mix(in srgb,var(--coral) 10%,var(--card));border-radius:16px;touch-action:none}
 @media(max-width:600px){.hero{grid-template-columns:minmax(0,1fr) 112px;padding:18px}.duo:not(.tight){grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
@@ -180,6 +207,22 @@ const DAYS = [
  { t: "La veille du retour", b: [{ type: 'recap' }, { type: 'q', title: "Le programme de nos retrouvailles", items: [T("La première heure…"),T("La première nuit…"),T("Ce que tu as préféré dans ces trois semaines")] }] },
  { t: "Le jour des retrouvailles", b: [{ type: 'letter', key: 'd19letter' }, { type: 'coupons', items: ["Un massage","Un petit-déj au lit","Tu choisis le film, sans discuter","Une soirée surprise organisée par moi","Un resto de ton choix","Des câlins illimités","Une nuit où c'est toi qui décides de tout","Un massage qui dérape","Un réveil très spécial"] }] }
 ];
+const EXTRA = {
+  4: { type: 'wheel', title: 'La roue des défis coquine', intro: "Fais tourner la roue une seule fois… et relève ton défi !", items: ["Décris-moi ta tenue, là, maintenant", "Dis-moi les 3 endroits de mon corps que tu préfères", "Raconte-moi le moment où tu as eu le plus envie de moi", "Écris le texto que tu m'enverrais si j'étais dans la pièce d'à côté", "Décris notre prochain baiser en 3 phrases", "Choisis la tenue que je porterai le 7", "Dis-moi ce que tu me chuchoterais à l'oreille ce soir", "Avoue un rêve que tu as fait de moi"] },
+  5: { type: 'map' },
+  6: { type: 'hangman' },
+  7: { type: 'scratch' },
+  8: { type: 'q', title: 'La phrase à deux', intro: "Chacun écrit la suite sans voir celle de l'autre.", items: [T("Le 7 décembre, à la gare, on…")] },
+  9: { type: 'gauge', items: ["À quel point tu as envie de moi en ce moment", "À quel point je te manque", "À quel point tu es impatiente qu'on se retrouve", "À quel point tu penses à moi le soir avant de dormir"] },
+  11: { type: 'puzzle' },
+  12: { type: 'pict', words: ["baiser", "massage", "bain moussant", "lingerie", "bougie", "fraise", "douche", "oreiller", "nuit à l'hôtel", "câlin", "menottes", "plume"], pick: { kevin: 1, awen: 9 } },
+  13: { type: 'emoji' },
+  14: { type: 'memory' },
+  16: { type: 'vocal' },
+  17: { type: 'catch' },
+  18: { type: 'kisses' }
+};
+for (const d in EXTRA) DAYS[d - 1].b.push(EXTRA[d]);
 const NAMES = { kevin: 'Kevin', awen: 'Awen' };
 let me = 'awen', other = 'kevin', isOwner = false;
 const SB = 'https://fxerdmyzkvrmhcoabjqp.supabase.co', KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4ZXJkbXl6a3ZybWhjb2FianFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwOTE2MTAsImV4cCI6MjExMDY2NzYxMH0.fP-qzWhzYlSVgzfa6sMZDdeOdlYnq70YB7Ry3l2qVLE';
@@ -228,6 +271,7 @@ function blockState(n, i, blk) {
   if (!answerable(blk)) return null;
   if (blk.only && blk.only !== me) return { mine: true, theirs: !!get(key(n, i, other)) };
   if (blk.type === 'coupons') return { mine: true, theirs: true };
+  if (blk.type === 'vocal') return { mine: !!get('vocal_' + me), theirs: !!get('vocal_' + other) };
   return { mine: !!get(key(n, i, me)), theirs: !!get(key(n, i, other)) };
 }
 function dayState(n) {
@@ -403,6 +447,267 @@ function autoSurprise() {
     if (!seen) { autoShown = true; openSurprise(); }
   });
 }
+let POST = [], busyGame = false, pzPending = null;
+const GS = {};
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const two = (n, i) => ({ mine: get(key(n, i, me)), theirs: get(key(n, i, other)), myG: get(key(n, i, 'g' + me)), theirG: get(key(n, i, 'g' + other)) });
+const sub = s => `<div class="sub"><h3>${s}</h3></div>`;
+function squareImg(file, size) {
+  return new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = size; const m = Math.min(im.width, im.height); c.getContext('2d').drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, size, size); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', .78)); }; im.onerror = rej; im.src = u; });
+}
+function scratchDone(id) { try { return isOwner || localStorage.getItem('pc_sc_' + id) === '1'; } catch { return false; } }
+function scratchHTML(id, inner, label) { return `<div class="scr" data-scr="${id}" data-lbl="${esc(label || 'Gratte ici')}"><div class="scr-in">${inner}</div><canvas></canvas></div>`; }
+function initScratch() {
+  document.querySelectorAll('.scr[data-scr]').forEach(el => {
+    const id = el.dataset.scr, cv = el.querySelector('canvas'); if (!cv) return;
+    if (scratchDone(id)) { cv.remove(); return; }
+    const r = el.getBoundingClientRect(); cv.width = Math.max(1, r.width); cv.height = Math.max(1, r.height);
+    const g = cv.getContext('2d'); const gr = g.createLinearGradient(0, 0, cv.width, cv.height); gr.addColorStop(0, '#e9c46a'); gr.addColorStop(.5, '#f7e3a1'); gr.addColorStop(1, '#d4a24c');
+    g.fillStyle = gr; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = '#7a5a1c'; g.font = '700 18px Nunito, sans-serif'; g.textAlign = 'center'; g.fillText(el.dataset.lbl + ' (gratte !)', cv.width / 2, cv.height / 2 + 6);
+    g.globalCompositeOperation = 'destination-out'; let down = false, moves = 0;
+    const er = e => { const b = cv.getBoundingClientRect(); g.beginPath(); g.arc(e.clientX - b.left, e.clientY - b.top, 22, 0, 7); g.fill(); if (++moves % 12 === 0) check(); };
+    const check = () => { const d = g.getImageData(0, 0, cv.width, cv.height).data; let c = 0, t = 0; for (let k = 3; k < d.length; k += 64) { t++; if (d[k] === 0) c++; } if (c / t > .5) { cv.style.opacity = 0; try { localStorage.setItem('pc_sc_' + id, '1'); } catch { } setTimeout(() => { cv.remove(); if (id.startsWith('cp')) renderDay(); }, 600); } };
+    cv.addEventListener('pointerdown', e => { down = true; cv.setPointerCapture(e.pointerId); er(e); });
+    cv.addEventListener('pointermove', e => { if (down) er(e); });
+    cv.addEventListener('pointerup', () => { down = false; check(); });
+  });
+}
+function guessUI(n, i, answer, tries, ph) {
+  const ok = tries.some(x => norm(x) && (norm(x) === norm(answer) || norm(x).includes(norm(answer)) || norm(answer).includes(norm(x)) && norm(x).length > 3));
+  if (ok) return `<p class="match">Trouvé ! C'était « ${esc(answer)} » (${tries.length} essai${tries.length > 1 ? 's' : ''})</p>`;
+  if (tries.length >= 3) return `<p class="miss">Raté… c'était « ${esc(answer)} »</p>`;
+  return (tries.length ? `<p class="miss">Pas ça… (${esc(tries.join(', '))}) Encore ${3 - tries.length} essai${3 - tries.length > 1 ? 's' : ''}</p>` : '') + `<input type="text" id="gu${n}_${i}" placeholder="${esc(ph)}"><button class="btn" data-g="guess" data-k="${n}_${i}">Proposer</button>`;
+}
+const GAMES = {
+  wheel(n, i, blk) {
+    const { mine, theirs } = two(n, i), N = blk.items.length, seg = 360 / N, cols = ['#ff5a4e', '#4a1d3a', '#12a4a0', '#f7b32b', '#7b4bd6', '#ff8fb1', '#e76f51', '#2a9d8f'];
+    let h = sub(esc(blk.title)) + `<p class="intro">${esc(blk.intro)}</p>`;
+    if (!mine) {
+      const P2 = a => [Math.sin(a * Math.PI / 180) * 95, -Math.cos(a * Math.PI / 180) * 95].map(v => v.toFixed(1)).join(' ');
+      const segs = blk.items.map((_, k) => { const a0 = k * seg, a1 = a0 + seg, m = a0 + seg / 2; return `<path d="M0 0 L${P2(a0)} A95 95 0 0 1 ${P2(a1)} Z" fill="${cols[k % cols.length]}"/><text x="${(Math.sin(m * Math.PI / 180) * 62).toFixed(1)}" y="${(-Math.cos(m * Math.PI / 180) * 62 + 7).toFixed(1)}" text-anchor="middle" fill="#fff" font-size="20" font-weight="700">${k + 1}</text>`; }).join('');
+      return h + `<div class="wheel"><svg id="wh${n}_${i}" viewBox="-100 -100 200 200"><circle r="98" fill="#fff"/>${segs}<circle r="12" fill="#fff"/></svg><div class="pin"></div></div><button class="btn" data-g="spin" data-k="${n}_${i}" style="display:flex;margin:10px auto 0">Faire tourner la roue</button>`;
+    }
+    const d = blk.items[mine.a.idx];
+    h += `<div class="wait">Ton défi : ${esc(d)}</div>`;
+    if (!mine.a.txt || editState[`w${n}_${i}`]) return h + `<label class="q" for="wt${n}_${i}">Relève ton défi</label><textarea id="wt${n}_${i}" rows="4">${esc(mine.a.txt || '')}</textarea><button class="btn" data-g="wsave" data-k="${n}_${i}">Envoyer</button>`;
+    h += `<div class="duo"><div><span class="who">Toi</span>${esc(mine.a.txt)}</div><div><span class="who">${NAMES[other]}${theirs ? ' · ' + esc(blk.items[theirs.a.idx]) : ''}</span>${theirs?.a?.txt ? (esc(theirs.a.txt)) : '<em>en attente…</em>'}</div></div>`;
+    return h;
+  },
+  map(n, i) {
+    const { mine, theirs } = two(n, i), k = `${n}_${i}`;
+    GS[k] ||= { pins: mine?.a ? [...mine.a] : [] };
+    const edit = !mine || editState['m' + k];
+    POST.push(() => drawMap(k, edit));
+    let h = sub('La carte de nos rêves') + `<p class="intro">${edit ? 'Touche la carte pour poser 3 épingles sur les endroits où tu veux aller avec moi, puis donne un nom à chacune.' : (theirs ? 'Tes épingles en rouge, celles de ' + NAMES[other] + ' en bleu.' : 'Tes épingles sont posées. Celles de ' + NAMES[other] + ' apparaîtront quand il' + (other === 'awen' ? ' ou elle' : '') + ' aura joué.')}</p><div class="map" id="map${k}"><p class="intro">Chargement de la carte…</p></div>`;
+    if (edit) return h + GS[k].pins.map((p, j) => `<label class="q" for="pn${k}_${j}">Épingle ${j + 1}</label><input type="text" id="pn${k}_${j}" value="${esc(p.name || '')}" placeholder="C'est où ?">`).join('') + (GS[k].pins.length ? `<button class="btn ghost" data-g="mapclear" data-k="${k}">Recommencer</button> ` : '') + `<button class="btn" data-g="mapsave" data-k="${k}" ${GS[k].pins.length < 3 ? 'disabled' : ''}>Envoyer mes épingles</button>`;
+    return h + `<div class="duo"><div><span class="who">Toi</span>${mine.a.map(p => esc(p.name)).join('<br>')}</div><div><span class="who">${NAMES[other]}</span>${theirs ? theirs.a.map(p => esc(p.name)).join('<br>') : '<em>en attente…</em>'}</div></div><button class="btn ghost" data-g="mapedit" data-k="${k}">Modifier</button>`;
+  },
+  hangman(n, i) {
+    const { mine, theirs, myG, theirG } = two(n, i), k = `${n}_${i}`;
+    let h = sub('Le mot mystère') + `<p class="intro">Choisis une phrase secrète pour ${NAMES[other]}, et essaie de deviner la sienne lettre par lettre. 7 erreurs maximum !</p>`;
+    if (!mine || editState['h' + k]) h += `<label class="q" for="hp${k}">Ta phrase mystère pour ${NAMES[other]}</label><input type="text" id="hp${k}" value="${esc(mine?.a || '')}" placeholder="ex. je t'aime petit cœur"><button class="btn" data-g="hset" data-k="${k}">Enregistrer</button>`;
+    else h += `<p>Ta phrase : <b>${esc(mine.a)}</b></p>` + (theirG ? `<p class="${theirG.a.ok ? 'match' : 'miss'}">${NAMES[other]} ${theirG.a.ok ? `l'a trouvée avec ${theirG.a.err} erreur${theirG.a.err > 1 ? 's' : ''}` : "ne l'a pas trouvée"}</p>` : `<p class="intro">${NAMES[other]} n'a pas encore joué.</p>`);
+    h += `<label class="q" style="margin-top:18px">La phrase de ${NAMES[other]}</label>`;
+    if (!theirs) return h + `<div class="wait">${NAMES[other]} n'a pas encore choisi sa phrase.</div>`;
+    const phrase = theirs.a, letters = new Set(norm(phrase).replace(/[^a-z]/g, ''));
+    if (myG) return h + `<div class="hm">${esc(phrase)}</div><p class="${myG.a.ok ? 'match' : 'miss'}">${myG.a.ok ? `Trouvé avec ${myG.a.err} erreur${myG.a.err > 1 ? 's' : ''} !` : 'Perdu… mais maintenant tu sais !'}</p>`;
+    const st = GS['h' + k] ||= { g: [] };
+    const err = st.g.filter(c => !letters.has(c)).length;
+    const masked = [...phrase].map(c => { const b = norm(c); return /^[a-z]$/.test(b) && !st.g.includes(b) ? '_' : c; }).join('');
+    return h + `<div class="hm">${esc(masked)}</div><p style="text-align:center;color:var(--coral);font-size:22px">${'♥'.repeat(7 - err)}<span style="opacity:.25">${'♥'.repeat(err)}</span></p><div class="keys">${'abcdefghijklmnopqrstuvwxyz'.split('').map(c => `<button data-g="hl" data-k="${k}" data-l="${c}" ${st.g.includes(c) ? 'disabled' : ''}>${c.toUpperCase()}</button>`).join('')}</div>`;
+  },
+  scratch(n, i) {
+    const { mine, theirs } = two(n, i), k = `${n}_${i}`;
+    POST.push(initScratch);
+    let h = sub('Le cœur à gratter') + `<p class="intro">Écris un message tendre que ${NAMES[other]} découvrira en grattant l'écran. Et gratte le sien !</p>`;
+    if (!mine || editState['s' + k]) h += `<label class="q" for="sm${k}">Ton message caché pour ${NAMES[other]}</label><textarea id="sm${k}" rows="4">${esc(mine?.a || '')}</textarea><button class="btn" data-g="smset" data-k="${k}">Cacher mon message</button>`;
+    else h += `<p class="intro">Ton message est caché, ${NAMES[other]} n'a plus qu'à gratter. <button class="btn ghost" style="margin:0 0 0 6px;padding:6px 12px;min-height:0" data-g="smedit" data-k="${k}">Modifier</button></p>`;
+    h += `<label class="q" style="margin-top:18px">Le message de ${NAMES[other]}</label>`;
+    return h + (theirs ? scratchHTML('m' + k + me, `<div class="note">${esc(theirs.a)}</div>`, 'Un message pour toi') : `<div class="wait">${NAMES[other]} n'a pas encore caché son message.</div>`);
+  },
+  gauge(n, i, blk) {
+    const { mine, theirs } = two(n, i), k = `${n}_${i}`;
+    let h = sub('La jauge') + `<p class="intro">Place chaque curseur entre 0 et 100, honnêtement…</p>`;
+    if (!mine || editState['g' + k]) return h + blk.items.map((q, j) => { const v = mine?.a?.[j] ?? 50; return `<label class="q" for="ga${k}_${j}">${esc(q)} : <span id="gv${k}_${j}">${v}</span></label><input type="range" min="0" max="100" value="${v}" id="ga${k}_${j}" oninput="document.getElementById('gv${k}_${j}').textContent=this.value">`; }).join('') + `<button class="btn" data-g="gsave" data-k="${k}">Envoyer</button>`;
+    return h + blk.items.map((q, j) => `<label class="q">${esc(q)}</label><div class="bar"><i style="width:${mine.a[j]}%"></i></div><span class="miss">Toi : ${mine.a[j]}</span>${theirs ? `<div class="bar o"><i style="width:${theirs.a[j]}%"></i></div><span class="miss">${NAMES[other]} : ${theirs.a[j]}</span>` : ''}`).join('') + (theirs ? '' : `<div class="wait">Les jauges de ${NAMES[other]} apparaîtront dès qu'il${other === 'awen' ? ' ou elle' : ''} aura répondu.</div>`) + `<button class="btn ghost" data-g="gedit" data-k="${k}">Modifier</button>`;
+  },
+  puzzle(n, i) {
+    const { mine, theirs, myG, theirG } = two(n, i), k = `${n}_${i}`;
+    let h = sub('Le puzzle') + `<p class="intro">Prépare un puzzle avec une photo pour ${NAMES[other]}, avec un message qui s'affiche quand il est terminé. Puis résous le sien, chrono en marche !</p>`;
+    if (!mine || editState['p' + k]) h += `<label class="q" for="pzf">La photo de ton puzzle</label><input class="file" type="file" accept="image/*" id="pzf" data-pzfile="1"><img id="pzpv" class="pv" ${pzPending || mine?.a?.img ? `src="${pzPending || mine.a.img}"` : 'hidden'} alt=""><label class="q" for="pzm">Le message qui s'affiche à la fin</label><textarea id="pzm" rows="3">${esc(mine?.a?.msg || '')}</textarea><button class="btn" data-g="pzset" data-k="${k}">Enregistrer mon puzzle</button>`;
+    else h += `<p class="intro">Ton puzzle est prêt.${theirG ? ` ${NAMES[other]} l'a fini en ${(theirG.a.ms / 1000).toFixed(1)} s.` : ''} <button class="btn ghost" style="margin:0 0 0 6px;padding:6px 12px;min-height:0" data-g="pzedit" data-k="${k}">Modifier</button></p>`;
+    h += `<label class="q" style="margin-top:18px">Le puzzle de ${NAMES[other]}</label>`;
+    if (!theirs) return h + `<div class="wait">${NAMES[other]} n'a pas encore préparé son puzzle.</div>`;
+    if (myG) return h + `<img src="${img(theirs.a.img) ? theirs.a.img : ''}" class="pv" style="max-width:330px;margin:8px auto" alt=""><div class="note">${esc(theirs.a.msg)}</div><p class="match">Ton temps : ${(myG.a.ms / 1000).toFixed(1)} s${theirG ? ` · ${NAMES[other]} : ${(theirG.a.ms / 1000).toFixed(1)} s` : ''}</p>`;
+    const st = GS['p' + k] ||= (() => { let o; do { o = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - .5); } while (o.every((v, x) => v === x)); return { o, sel: -1, t0: 0 }; })();
+    const src = img(theirs.a.img) ? theirs.a.img : '';
+    return h + `<div class="pz">${st.o.map((t, pos) => `<button data-g="pzt" data-k="${k}" data-p="${pos}" class="${st.sel === pos ? 'sel' : ''}" style="background-image:url(${src});background-position:${(t % 3) * 50}% ${Math.floor(t / 3) * 50}%"></button>`).join('')}</div><p class="intro" style="text-align:center">Touche deux pièces pour les échanger.</p>`;
+  },
+  pict(n, i, blk) {
+    const { mine, theirs, myG, theirG } = two(n, i), k = `${n}_${i}`;
+    const myWord = blk.words[blk.pick[me]], theirWord = blk.words[blk.pick[other]];
+    let h = sub('Le dessin à deviner') + `<p class="intro">Dessine le mot que l'appli t'a tiré au sort, sans écrire de lettres ! ${NAMES[other]} doit deviner, et tu devines le sien.</p>`;
+    if (!mine || editState['d' + k]) h += `<div class="wait">Ton mot à dessiner : ${esc(myWord)}</div><div class="draw"><canvas id="cv${n}_${i}_0" width="800" height="600" data-cv="${n}_${i}_0"></canvas><div class="tools">${DCOLS.map(c => `<button type="button" class="sw ${dstate.color === c && !dstate.erase ? 'sel' : ''}" style="background:${c}" data-dcol="${c}" aria-label="Couleur"></button>`).join('')}<button type="button" class="tl ${dstate.size === 5 ? 'sel' : ''}" data-dsize="5">Fin</button><button type="button" class="tl ${dstate.size === 14 ? 'sel' : ''}" data-dsize="14">Épais</button><button type="button" class="tl" data-derase="1">Gomme</button><button type="button" class="tl" data-dclear="${n}_${i}_0">Recommencer</button></div></div><button class="btn" data-g="pxsave" data-k="${k}">Envoyer mon dessin</button>`;
+    else h += `<p class="intro">Ton dessin de « ${esc(myWord)} » est envoyé.${theirG ? ' ' + NAMES[other] + ' a proposé : ' + esc(theirG.a.join(', ')) : ''}</p>`;
+    h += `<label class="q" style="margin-top:18px">Le dessin de ${NAMES[other]}</label>`;
+    if (!theirs) return h + `<div class="wait">${NAMES[other]} n'a pas encore dessiné.</div>`;
+    return h + `<div class="duo" style="grid-template-columns:1fr"><div>${img(theirs.a[0])}</div></div>` + guessUI(n, i, theirWord, myG?.a || [], 'Ta réponse');
+  },
+  emoji(n, i) {
+    const { mine, theirs, myG, theirG } = two(n, i), k = `${n}_${i}`;
+    let h = sub('Devine la chanson en émojis') + `<p class="intro">Choisis une chanson et code-la uniquement avec des émojis. ${NAMES[other]} doit trouver laquelle !</p>`;
+    if (!mine || editState['e' + k]) h += `<label class="q" for="ee${k}">Tes émojis</label><input type="text" id="ee${k}" value="${esc(mine?.a?.emo || '')}" placeholder="🌙💃🎶…"><label class="q" for="ea${k}">La réponse (titre de la chanson)</label><input type="text" id="ea${k}" value="${esc(mine?.a?.ans || '')}"><button class="btn" data-g="eset" data-k="${k}">Enregistrer</button>`;
+    else h += `<p class="intro">Ta chanson : ${esc(mine.a.emo)} = « ${esc(mine.a.ans)} »${theirG ? '. ' + NAMES[other] + ' a proposé : ' + esc(theirG.a.join(', ')) : ''}</p>`;
+    h += `<label class="q" style="margin-top:18px">La chanson de ${NAMES[other]}</label>`;
+    if (!theirs) return h + `<div class="wait">${NAMES[other]} n'a pas encore codé sa chanson.</div>`;
+    return h + `<div class="big" style="font-size:44px;margin:10px 0">${esc(theirs.a.emo)}</div>` + guessUI(n, i, theirs.a.ans, myG?.a || [], 'Le titre de la chanson');
+  },
+  memory(n, i) {
+    const { mine, theirs } = two(n, i), k = `${n}_${i}`;
+    let h = sub('Le memory de nos photos') + `<p class="intro">Retrouve les paires parmi nos photos de ces dernières semaines, en un minimum de coups.</p>`;
+    const pics = [...new Set([get('asset1')?.img, get('asset2')?.img, ...Object.values(R).flatMap(d => Array.isArray(d?.a) ? d.a : (d?.a?.img ? [d.a.img] : []))].filter(x => img(x)))].slice(-6);
+    const res = (d, w) => d ? `${d.a.moves} coups · ${(d.a.ms / 1000).toFixed(0)} s` : '<em>pas encore joué</em>';
+    const score = `<div class="duo"><div><span class="who">Toi</span>${res(mine)}</div><div><span class="who">${NAMES[other]}</span>${res(theirs)}</div></div>`;
+    if (pics.length < 3) return h + `<div class="wait">Pas encore assez de photos pour jouer.</div>`;
+    const st = GS['mem' + k];
+    if (!st) return h + score + `<button class="btn" data-g="memgo" data-k="${k}">${mine ? 'Rejouer' : 'Jouer'}</button>`;
+    st.pics = pics;
+    return h + `<div class="mem">${st.c.map((p, x) => { const up = st.open.includes(x) || st.ok.includes(x); return `<button data-g="memc" data-k="${k}" data-x="${x}" class="${up ? 'up' : ''} ${st.ok.includes(x) ? 'ok' : ''}" style="${up ? `background-image:url(${pics[p]})` : ''}"></button>`; }).join('')}</div><p class="intro" style="text-align:center">${st.moves} coups</p>`;
+  },
+  vocal() {
+    const mineV = get('vocal_' + me), theirV = get('vocal_' + other);
+    const open = Date.now() >= Date.UTC(2026, 11, 4, 21);
+    let h = sub('Le vocal secret') + `<p class="intro">Enregistre-moi un message vocal (avec l'app Dictaphone, puis Partager → Enregistrer dans Fichiers), et dépose-le ici. On ne pourra les écouter qu'à partir de 22 h heure de Bordeaux (17 h en Martinique).</p>`;
+    h += `<label class="q" for="vf">Ton vocal pour ${NAMES[other]}</label>${mineV ? `<p class="match">Déposé : ${esc(mineV.name)}</p>` : ''}<input class="file" type="file" accept="audio/*,.m4a,.mp3,.wav,.aac" id="vf" data-vocal="1"><div class="err" id="verr" hidden></div><p class="intro" id="vok"></p>`;
+    h += `<label class="q" style="margin-top:18px">Le vocal de ${NAMES[other]}</label>`;
+    if (!theirV) return h + `<div class="wait">${NAMES[other]} n'a pas encore déposé son vocal.</div>`;
+    if (!open) return h + `<div class="wait">Son vocal t'attend… rendez-vous à 22 h (17 h en Martinique).</div>`;
+    return h + `<div id="vplay"><button class="btn" data-g="vplay">Écouter</button></div>`;
+  },
+  catch(n, i) {
+    const { mine, theirs } = two(n, i), k = `${n}_${i}`;
+    let h = sub('Attrape les cœurs') + `<p class="intro">30 secondes pour attraper un maximum de cœurs en glissant le doigt. Attention aux nuages !</p>`;
+    h += `<div class="duo"><div><span class="who">Ton record</span>${mine ? mine.a : '–'}</div><div><span class="who">${NAMES[other]}</span>${theirs ? theirs.a : '<em>pas encore joué</em>'}</div></div>`;
+    return h + `<canvas class="game" id="gm${k}" width="360" height="480"></canvas><button class="btn" data-g="catchgo" data-k="${k}" style="display:flex;margin:0 auto">Jouer</button>`;
+  },
+  kisses(n, i) {
+    const { mine, theirs } = two(n, i), k = `${n}_${i}`;
+    const m = (mine?.a || 0) + (GS.kiss || 0), o = theirs?.a || 0;
+    return sub('Le compteur de bisous') + `<p class="intro">Tape sur le cœur pour m'envoyer des bisous. Tous nos bisous s'additionnent jusqu'aux retrouvailles !</p><div class="big" id="kt">${m + o}</div><p class="intro" style="text-align:center">bisous envoyés à deux · toi <span id="km">${m}</span> · ${NAMES[other]} ${o}</p><button class="kiss" data-g="kiss" data-k="${k}" aria-label="Envoyer un bisou"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#ff5a4e"/></svg></button>`;
+  }
+};
+let mapLib = null;
+async function drawMap(k, edit) {
+  const box = document.getElementById('map' + k); if (!box) return;
+  try {
+    mapLib ||= (async () => { const [geo, topo, world] = await Promise.all([import('https://cdn.jsdelivr.net/npm/d3-geo@3/+esm'), import('https://cdn.jsdelivr.net/npm/topojson-client@3/+esm'), fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json())]); return { geo, land: topo.feature(world, world.objects.countries) }; })();
+    const { geo, land } = await mapLib;
+    const W = 800, H = 420, proj = geo.geoNaturalEarth1().fitSize([W, H], { type: 'Sphere' }), path = geo.geoPath(proj);
+    const [n, i] = k.split('_').map(Number), { mine, theirs } = two(n, i);
+    const pinSvg = (p, c) => { const [x, y] = proj([p.lon, p.lat]); return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><path d="M0 0 C-9 -12 -9 -24 0 -24 C9 -24 9 -12 0 0Z" fill="${c}" stroke="#fff" stroke-width="2"/><circle cy="-16" r="3.5" fill="#fff"/></g>`; };
+    const mp = edit ? GS[k].pins : (mine?.a || []);
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" id="msv${k}"><path d="${path(land)}" fill="color-mix(in srgb, var(--plum) 35%, transparent)" stroke="#fff" stroke-width=".5"/>${mp.map(p => pinSvg(p, '#ff5a4e')).join('')}${!edit && theirs ? theirs.a.map(p => pinSvg(p, '#12a4a0')).join('') : ''}</svg>`;
+    if (edit) box.querySelector('svg').addEventListener('click', e => {
+      if (GS[k].pins.length >= 3) return; const s = e.currentTarget, r = s.getBoundingClientRect();
+      const ll = proj.invert([(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]); if (!ll || isNaN(ll[0])) return;
+      keepNames(k); GS[k].pins.push({ lon: ll[0], lat: ll[1], name: '' }); renderDay();
+    });
+  } catch (e) { box.innerHTML = '<p class="intro">La carte ne charge pas… vérifie ta connexion.</p>'; }
+}
+function keepNames(k) { (GS[k]?.pins || []).forEach((p, j) => { const el = document.getElementById(`pn${k}_${j}`); if (el) p.name = el.value; }); }
+let kissTimer = null;
+const GAMEACT = {
+  async spin(t) {
+    const [n, i] = t.dataset.k.split('_').map(Number), blk = DAYS[n - 1].b[i], N = blk.items.length, idx = Math.floor(Math.random() * N);
+    const sv = document.getElementById(`wh${n}_${i}`); busyGame = true; t.setAttribute('disabled', '');
+    const deg = 360 * 6 - (idx * 360 / N + 180 / N);
+    sv.style.transition = 'transform 3.6s cubic-bezier(.15,.85,.2,1)'; sv.style.transform = `rotate(${deg}deg)`;
+    await new Promise(r => setTimeout(r, 3800)); busyGame = false;
+    await save(key(n, i, me), { a: { idx } }, null); renderDay(); renderGrid();
+  },
+  async wsave(t) { const [n, i] = t.dataset.k.split('_').map(Number), m = get(key(n, i, me)); const txt = document.getElementById(`wt${n}_${i}`).value.trim(); if (!txt) return; if (await save(key(n, i, me), { a: { idx: m.a.idx, txt } }, null)) { delete editState[`w${n}_${i}`]; renderDay(); } },
+  mapclear(t) { GS[t.dataset.k].pins = []; renderDay(); },
+  mapedit(t) { editState['m' + t.dataset.k] = true; renderDay(); },
+  async mapsave(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number); keepNames(k); const pins = GS[k].pins.map((p, j) => ({ ...p, name: p.name.trim() || 'Épingle ' + (j + 1) })); if (await save(key(n, i, me), { a: pins }, null)) { delete editState['m' + k]; renderDay(); renderGrid(); } },
+  async hset(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), v = document.getElementById('hp' + k).value.trim(); if (!v) return; if (await save(key(n, i, me), { a: v }, null)) { delete editState['h' + k]; renderDay(); renderGrid(); } },
+  async hl(t) {
+    const k = t.dataset.k, [n, i] = k.split('_').map(Number), st = GS['h' + k]; st.g.push(t.dataset.l);
+    const phrase = get(key(n, i, other)).a, letters = new Set(norm(phrase).replace(/[^a-z]/g, '')), err = st.g.filter(c => !letters.has(c)).length;
+    const won = [...letters].every(c => st.g.includes(c));
+    if (won || err >= 7) await save(key(n, i, 'g' + me), { a: { ok: won, err } }, null);
+    renderDay();
+  },
+  async smset(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), v = document.getElementById('sm' + k).value.trim(); if (!v) return; if (await save(key(n, i, me), { a: v }, null)) { delete editState['s' + k]; renderDay(); renderGrid(); } },
+  smedit(t) { editState['s' + t.dataset.k] = true; renderDay(); },
+  async gsave(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), N = DAYS[n - 1].b[i].items.length; const a = [...Array(N)].map((_, j) => +document.getElementById(`ga${k}_${j}`).value); if (await save(key(n, i, me), { a }, null)) { delete editState['g' + k]; renderDay(); renderGrid(); } },
+  gedit(t) { editState['g' + t.dataset.k] = true; renderDay(); },
+  async pzset(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), old = get(key(n, i, me))?.a; const im = pzPending || old?.img; if (!im) return; if (await save(key(n, i, me), { a: { img: im, msg: $('#pzm').value.trim() } }, null)) { pzPending = null; delete editState['p' + k]; renderDay(); renderGrid(); } },
+  pzedit(t) { editState['p' + t.dataset.k] = true; renderDay(); },
+  async pzt(t) {
+    const k = t.dataset.k, [n, i] = k.split('_').map(Number), st = GS['p' + k], p = +t.dataset.p;
+    if (!st.t0) { st.t0 = Date.now(); busyGame = true; }
+    if (st.sel < 0) st.sel = p; else { [st.o[st.sel], st.o[p]] = [st.o[p], st.o[st.sel]]; st.sel = -1; }
+    if (st.o.every((v, x) => v === x)) { busyGame = false; await save(key(n, i, 'g' + me), { a: { ms: Date.now() - st.t0 } }, null); }
+    renderDay();
+  },
+  async pxsave(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), d = photos[`${n}_${i}_0`]; if (!d) return; if (await save(key(n, i, me), { a: [d] }, null)) { delete editState['d' + k]; renderDay(); renderGrid(); } },
+  async guess(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), v = document.getElementById('gu' + k).value.trim(); if (!v) return; const prev = get(key(n, i, 'g' + me))?.a || []; if (await save(key(n, i, 'g' + me), { a: [...prev, v] }, null)) renderDay(); },
+  async eset(t) { const k = t.dataset.k, [n, i] = k.split('_').map(Number), emo = document.getElementById('ee' + k).value.trim(), ans = document.getElementById('ea' + k).value.trim(); if (!emo || !ans) return; if (await save(key(n, i, me), { a: { emo, ans } }, null)) { delete editState['e' + k]; renderDay(); renderGrid(); } },
+  memgo(t) {
+    const k = t.dataset.k, [n, i] = k.split('_').map(Number);
+    const pics = [...new Set([get('asset1')?.img, get('asset2')?.img, ...Object.values(R).flatMap(d => Array.isArray(d?.a) ? d.a : (d?.a?.img ? [d.a.img] : []))].filter(x => img(x)))].slice(-6);
+    GS['mem' + k] = { c: [...pics.keys(), ...pics.keys()].sort(() => Math.random() - .5), open: [], ok: [], moves: 0, t0: Date.now() }; busyGame = true; renderDay();
+  },
+  async memc(t) {
+    const k = t.dataset.k, [n, i] = k.split('_').map(Number), st = GS['mem' + k], x = +t.dataset.x;
+    if (st.lock || st.open.includes(x) || st.ok.includes(x)) return;
+    st.open.push(x);
+    if (st.open.length === 2) {
+      st.moves++; const [a, b] = st.open;
+      if (st.c[a] === st.c[b]) { st.ok.push(a, b); st.open = []; }
+      else { st.lock = true; renderDay(); await new Promise(r => setTimeout(r, 900)); st.open = []; st.lock = false; }
+    }
+    if (st.ok.length === st.c.length) {
+      const res = { moves: st.moves, ms: Date.now() - st.t0 }, best = get(key(n, i, me))?.a;
+      delete GS['mem' + k]; busyGame = false;
+      if (!best || res.moves < best.moves || (res.moves === best.moves && res.ms < best.ms)) await save(key(n, i, me), { a: res }, null);
+    }
+    renderDay(); renderGrid();
+  },
+  async vplay(t) {
+    t.setAttribute('disabled', ''); t.textContent = 'Chargement…';
+    try { const v = await rpc('pc_vocal', { t: TOKEN }); if (!v?.data || !/^data:(audio|video)\//.test(v.data)) throw 0; const url = URL.createObjectURL(await (await fetch(v.data)).blob()); $('#vplay').innerHTML = `<audio controls src="${url}" style="width:100%;margin-top:8px"></audio>`; }
+    catch { t.textContent = 'Pas encore disponible'; }
+  },
+  catchgo(t) {
+    const k = t.dataset.k, [n, i] = k.split('_').map(Number), cv = document.getElementById('gm' + k), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+    t.setAttribute('disabled', ''); busyGame = true;
+    let x = W / 2, score = 0, items = [], last = 0, t0 = performance.now();
+    const mv = e => { const r = cv.getBoundingClientRect(); x = Math.max(30, Math.min(W - 30, (e.clientX - r.left) * W / r.width)); };
+    cv.addEventListener('pointermove', mv); cv.addEventListener('pointerdown', mv);
+    const heart = (cx, cy, s, c) => { g.fillStyle = c; g.beginPath(); g.moveTo(cx, cy + s * .35); g.bezierCurveTo(cx - s, cy - s * .4, cx - s * .35, cy - s, cx, cy - s * .45); g.bezierCurveTo(cx + s * .35, cy - s, cx + s, cy - s * .4, cx, cy + s * .35); g.fill(); };
+    const loop = now => {
+      const el = (now - t0) / 1000, left = Math.max(0, 30 - el);
+      if (now - last > Math.max(260, 650 - el * 14)) { last = now; items.push({ x: 20 + Math.random() * (W - 40), y: -20, v: 2.2 + Math.random() * 2 + el / 10, bad: Math.random() < .22 }); }
+      g.clearRect(0, 0, W, H);
+      items.forEach(it => { it.y += it.v; if (it.bad) { g.fillStyle = '#9aa3ad'; g.beginPath(); g.arc(it.x - 8, it.y, 10, 0, 7); g.arc(it.x + 6, it.y - 4, 12, 0, 7); g.arc(it.x + 16, it.y + 2, 8, 0, 7); g.fill(); } else heart(it.x, it.y, 16, '#ff5a4e'); if (Math.abs(it.x - x) < 36 && it.y > H - 60 && it.y < H - 30 && !it.hit) { it.hit = true; score += it.bad ? -3 : 1; } });
+      items = items.filter(it => !it.hit && it.y < H + 30);
+      g.fillStyle = '#4a1d3a'; g.fillRect(x - 34, H - 34, 68, 16); g.beginPath(); g.arc(x, H - 34, 34, Math.PI, 0); g.fillStyle = 'rgba(74,29,58,.25)'; g.fill();
+      g.fillStyle = '#3a1430'; g.font = '700 20px Nunito, sans-serif'; g.textAlign = 'left'; g.fillText('♥ ' + score, 12, 28); g.textAlign = 'right'; g.fillText(Math.ceil(left) + ' s', W - 12, 28);
+      if (left > 0) requestAnimationFrame(loop);
+      else { busyGame = false; g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(0, 0, W, H); g.fillStyle = '#ff5a4e'; g.textAlign = 'center'; g.font = '700 40px Fredoka, sans-serif'; g.fillText(score + ' cœurs !', W / 2, H / 2); const best = get(key(n, i, me))?.a || -1e9; (score > best ? save(key(n, i, me), { a: score }, null) : Promise.resolve()).then(() => setTimeout(() => { renderDay(); renderGrid(); }, 1500)); }
+    };
+    requestAnimationFrame(loop);
+  },
+  kiss(t) {
+    const k = t.dataset.k, [n, i] = k.split('_').map(Number);
+    GS.kiss = (GS.kiss || 0) + 1; busyGame = true;
+    const m = (get(key(n, i, me))?.a || 0) + GS.kiss, o = get(key(n, i, other))?.a || 0;
+    $('#kt').textContent = m + o; $('#km').textContent = m;
+    t.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], 220);
+    clearTimeout(kissTimer); kissTimer = setTimeout(async () => { const add = GS.kiss; const base = get(key(n, i, me))?.a || 0; if (await save(key(n, i, me), { a: base + add }, null)) { GS.kiss -= add; } busyGame = false; }, 1500);
+  }
+};
 function renderLetter(n, i, blk) {
   const doc = get(blk.key);
   if (isOwner) {
@@ -429,6 +734,13 @@ function renderRecap() {
 
 function renderCoupons(n, i, blk) {
   const used = get(key(n, i, 'awen'))?.used || [];
+  if (!isOwner) {
+    POST.push(initScratch);
+    return `<h3>Tes bons, valables dès ton retour</h3><p class="intro">Gratte chaque bon pour le découvrir, puis touche « Utiliser » quand tu veux en profiter. Je suis obligé de dire oui.</p>` + blk.items.map((c, j) => {
+      const u = used.includes(j), sid = `cp${n}_${j}`;
+      return scratchDone(sid) || u ? `<div class="coupon ${u ? 'used' : ''}"><b>${esc(c)}</b>${u ? '<span class="match">utilisé</span>' : `<button class="btn" data-coupon="${n}_${i}_${j}">Utiliser</button>`}</div>` : `<div class="coupon" style="padding:0;display:block">${scratchHTML(sid, `<b>${esc(c)}</b>`, 'Bon n°' + (j + 1))}</div>`;
+    }).join('');
+  }
   return `<h3>Tes bons, valables dès ton retour</h3><p class="intro">${isOwner ? 'Awen verra ici les bons utilisés.' : 'Touche « Utiliser » quand tu veux en profiter. Je suis obligé de dire oui.'}</p>` + blk.items.map((c, j) => {
     const u = used.includes(j);
     return `<div class="coupon ${u ? 'used' : ''}"><b>${esc(c)}</b>${u ? '<span class="match">utilisé</span>' : isOwner ? '<span class="miss">dispo</span>' : `<button class="btn" data-coupon="${n}_${i}_${j}">Utiliser</button>`}</div>`;
@@ -439,6 +751,7 @@ const editState = {}, draft = {};
 let openDay = 0;
 function renderDay() {
   const n = openDay; if (!n) return;
+  POST = [];
   const d = DAYS[n - 1];
   const html = d.b.map((blk, i) => {
     let inner = '';
@@ -448,6 +761,7 @@ function renderDay() {
     else if (blk.type === 'vote') inner = renderChoices(n, i, blk, true);
     else if (blk.type === 'truths') inner = renderTruths(n, i, blk);
     else if (blk.type === 'envies') inner = renderEnvies(n, i, blk);
+    else if (GAMES[blk.type]) inner = GAMES[blk.type](n, i, blk);
     else if (blk.type === 'quiz') inner = renderQuiz(n, i, blk);
     else if (blk.type === 'letter') inner = renderLetter(n, i, blk);
     else if (blk.type === 'recap') inner = renderRecap();
@@ -462,6 +776,7 @@ function renderDay() {
   for (const id in photos) { const pv = document.getElementById('pv' + id); if (pv) { pv.src = photos[id]; pv.hidden = false; } }
   if (active && document.getElementById(active)) document.getElementById(active).focus();
   initCanvases();
+  POST.forEach(f => { try { f(); } catch (e) { console.error(e); } });
   autoSurprise();
 }
 
@@ -495,6 +810,15 @@ function compress(file, max = 900, q = .72) {
 const photos = {};
 document.addEventListener('change', async e => {
   const f = e.target; if (f.type !== 'file' || !f.files[0]) return;
+  if (f.dataset.pzfile) { try { pzPending = await squareImg(f.files[0], 600); $('#pzpv').src = pzPending; $('#pzpv').hidden = false; } catch { } return; }
+  if (f.dataset.vocal) {
+    const file = f.files[0], err = $('#verr'); err.hidden = true;
+    if (file.size > 5e6) { err.hidden = false; err.textContent = 'Vocal trop long (5 Mo maximum, environ 4-5 minutes).'; return; }
+    const data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    $('#vok').textContent = 'Envoi…';
+    if (await save('vocal_' + me, { name: file.name, data: /^data:;/.test(data) ? data.replace('data:;', 'data:audio/mp4;') : data }, err)) { R['vocal_' + me] = { name: file.name }; renderDay(); renderGrid(); }
+    return;
+  }
   if (f.dataset.surprise) {
     const file = f.files[0], err = $('#serr'); err.hidden = true;
     if (file.size > 4.5e6) { err.hidden = false; err.textContent = 'Fichier trop lourd (4 Mo maximum).'; return; }
@@ -536,6 +860,7 @@ document.addEventListener('click', async e => {
   if (t.dataset.dcol) { dstate.color = t.dataset.dcol; dstate.erase = false; t.closest('.tools').querySelectorAll('.sw,[data-derase]').forEach(b => b.classList.toggle('sel', b === t)); return; }
   if (t.dataset.dsize) { dstate.size = +t.dataset.dsize; dstate.erase = false; t.closest('.tools').querySelectorAll('[data-dsize],[data-derase]').forEach(b => b.classList.toggle('sel', b === t)); return; }
   if (t.dataset.derase) { dstate.erase = true; t.closest('.tools').querySelectorAll('.sw,[data-derase]').forEach(b => b.classList.toggle('sel', b === t)); return; }
+  if (t.dataset.g && GAMEACT[t.dataset.g]) { GAMEACT[t.dataset.g](t); return; }
   if (t.dataset.dclear) { const cv = document.getElementById('cv' + t.dataset.dclear); const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); delete photos[t.dataset.dclear]; return; }
   if (t.dataset.surp) { openSurprise(); return; }
   if (t.dataset.ssave) {
@@ -578,7 +903,7 @@ async function load() {
     const fresh = res.r || {}; let changed = false;
     for (const k of new Set([...Object.keys(R), ...Object.keys(fresh)])) if (JSON.stringify(R[k]) !== JSON.stringify(fresh[k])) { changed = true; if (fresh[k] === undefined) delete R[k]; else R[k] = fresh[k]; }
     $('#banner').classList.remove('on');
-    if (changed) { paintHome(); route(); renderGrid(); if (openDay && !document.activeElement?.matches('textarea,input')) renderDay(); }
+    if (changed) { paintHome(); route(); renderGrid(); if (openDay && !busyGame && !document.activeElement?.matches('textarea,input')) renderDay(); }
   } catch (e) {
     const b = $('#banner'); b.classList.add('on');
     b.textContent = e.status === 400 && /bad token/.test(e.message) ? "Ce lien n'est pas le bon : rouvre le lien que Kevin t'a envoyé." : "Pas de connexion pour l'instant… les réponses arriveront dès que ça revient.";

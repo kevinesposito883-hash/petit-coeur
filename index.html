@@ -131,7 +131,7 @@ input[type=range]{width:100%;accent-color:var(--coral);height:32px}
 .mem button{all:unset;cursor:pointer;aspect-ratio:1;border-radius:12px;background:var(--plum);background-size:cover;background-position:center}
 .mem button.up{background-color:#fff}
 .mem button.ok{opacity:.55}
-.map svg{width:100%;display:block;background:color-mix(in srgb,var(--sea) 18%,transparent);border-radius:14px;touch-action:manipulation}
+.map .lf{height:min(62vh,440px);border-radius:14px;position:relative;z-index:0;font:inherit}
 .kiss{all:unset;cursor:pointer;display:block;margin:10px auto;width:150px;height:150px}
 .kiss:active{transform:scale(.94)}
 .big{font-family:Fredoka;font-size:clamp(48px,14vw,72px);color:var(--coral);text-align:center;line-height:1}
@@ -498,7 +498,7 @@ const GAMES = {
     GS[k] ||= { pins: mine?.a ? [...mine.a] : [] };
     const edit = !mine || editState['m' + k];
     POST.push(() => drawMap(k, edit));
-    let h = sub('La carte de nos rêves') + `<p class="intro">${edit ? 'Touche la carte pour poser 3 épingles sur les endroits où tu veux aller avec moi, puis donne un nom à chacune.' : (theirs ? 'Tes épingles en rouge, celles de ' + NAMES[other] + ' en bleu.' : 'Tes épingles sont posées. Celles de ' + NAMES[other] + ' apparaîtront quand il' + (other === 'awen' ? ' ou elle' : '') + ' aura joué.')}</p><div class="map" id="map${k}"><p class="intro">Chargement de la carte…</p></div>`;
+    let h = sub('La carte de nos rêves') + `<p class="intro">${edit ? 'Zoome avec deux doigts (ou les boutons + et −), puis touche la carte pour poser 3 épingles sur les endroits où tu veux aller avec moi. Tu peux déplacer une épingle en la faisant glisser, puis donne un nom à chacune.' : (theirs ? 'Tes épingles en rouge, celles de ' + NAMES[other] + ' en bleu.' : 'Tes épingles sont posées. Celles de ' + NAMES[other] + ' apparaîtront quand il' + (other === 'awen' ? ' ou elle' : '') + ' aura joué.')}</p><div class="map" id="map${k}"><p class="intro">Chargement de la carte…</p></div>`;
     if (edit) return h + GS[k].pins.map((p, j) => `<label class="q" for="pn${k}_${j}">Épingle ${j + 1}</label><input type="text" id="pn${k}_${j}" value="${esc(p.name || '')}" placeholder="C'est où ?">`).join('') + (GS[k].pins.length ? `<button class="btn ghost" data-g="mapclear" data-k="${k}">Recommencer</button> ` : '') + `<button class="btn" data-g="mapsave" data-k="${k}" ${GS[k].pins.length < 3 ? 'disabled' : ''}>Envoyer mes épingles</button>`;
     return h + `<div class="duo"><div><span class="who">Toi</span>${mine.a.map(p => esc(p.name)).join('<br>')}</div><div><span class="who">${NAMES[other]}</span>${theirs ? theirs.a.map(p => esc(p.name)).join('<br>') : '<em>en attente…</em>'}</div></div><button class="btn ghost" data-g="mapedit" data-k="${k}">Modifier</button>`;
   },
@@ -596,22 +596,28 @@ const GAMES = {
     return sub('Le compteur de bisous') + `<p class="intro">Tape sur le cœur pour m'envoyer des bisous. Tous nos bisous s'additionnent jusqu'aux retrouvailles !</p><div class="big" id="kt">${m + o}</div><p class="intro" style="text-align:center">bisous envoyés à deux · toi <span id="km">${m}</span> · ${NAMES[other]} ${o}</p><button class="kiss" data-g="kiss" data-k="${k}" aria-label="Envoyer un bisou"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#ff5a4e"/></svg></button>`;
   }
 };
-let mapLib = null;
+let LL = null;
+function loadLeaflet() {
+  return LL ||= new Promise((res, rej) => {
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css);
+    const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'; s.onload = () => res(window.L); s.onerror = () => { LL = null; rej(); }; document.head.appendChild(s);
+  });
+}
 async function drawMap(k, edit) {
   const box = document.getElementById('map' + k); if (!box) return;
   try {
-    mapLib ||= (async () => { const [geo, topo, world] = await Promise.all([import('https://cdn.jsdelivr.net/npm/d3-geo@3/+esm'), import('https://cdn.jsdelivr.net/npm/topojson-client@3/+esm'), fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json())]); return { geo, land: topo.feature(world, world.objects.countries) }; })();
-    const { geo, land } = await mapLib;
-    const W = 800, H = 420, proj = geo.geoNaturalEarth1().fitSize([W, H], { type: 'Sphere' }), path = geo.geoPath(proj);
-    const [n, i] = k.split('_').map(Number), { mine, theirs } = two(n, i);
-    const pinSvg = (p, c) => { const [x, y] = proj([p.lon, p.lat]); return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><path d="M0 0 C-9 -12 -9 -24 0 -24 C9 -24 9 -12 0 0Z" fill="${c}" stroke="#fff" stroke-width="2"/><circle cy="-16" r="3.5" fill="#fff"/></g>`; };
-    const mp = edit ? GS[k].pins : (mine?.a || []);
-    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" id="msv${k}"><path d="${path(land)}" fill="color-mix(in srgb, var(--plum) 35%, transparent)" stroke="#fff" stroke-width=".5"/>${mp.map(p => pinSvg(p, '#ff5a4e')).join('')}${!edit && theirs ? theirs.a.map(p => pinSvg(p, '#12a4a0')).join('') : ''}</svg>`;
-    if (edit) box.querySelector('svg').addEventListener('click', e => {
-      if (GS[k].pins.length >= 3) return; const s = e.currentTarget, r = s.getBoundingClientRect();
-      const ll = proj.invert([(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]); if (!ll || isNaN(ll[0])) return;
-      keepNames(k); GS[k].pins.push({ lon: ll[0], lat: ll[1], name: '' }); renderDay();
-    });
+    const L = await loadLeaflet(); if (!document.body.contains(box)) return;
+    box.innerHTML = '<div class="lf"></div>';
+    const st = GS[k], [n, i] = k.split('_').map(Number), { mine, theirs } = two(n, i);
+    const map = L.map(box.firstChild, { worldCopyJump: true, tap: false }).setView(st.view?.c || [25, -20], st.view?.z ?? 1);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 18 }).addTo(map);
+    map.on('moveend', () => { const c = map.getCenter(); st.view = { c: [c.lat, c.lng], z: map.getZoom() }; });
+    const icon = c => L.divIcon({ className: '', html: `<svg width="30" height="40" viewBox="-15 -38 30 40"><path d="M0 0 C-12 -15 -12 -36 0 -36 C12 -36 12 -15 0 0Z" fill="${c}" stroke="#fff" stroke-width="2"/><circle cy="-23" r="5" fill="#fff"/></svg>`, iconSize: [30, 40], iconAnchor: [15, 38] });
+    const pins = edit ? st.pins : (mine?.a || []);
+    pins.forEach(p => { const m = L.marker([p.lat, p.lon], { icon: icon('#ff5a4e'), draggable: edit }).addTo(map); if (p.name) m.bindTooltip(esc(p.name)); if (edit) m.on('dragend', () => { const q = m.getLatLng().wrap(); p.lat = q.lat; p.lon = q.lng; }); });
+    if (!edit && theirs) theirs.a.forEach(p => L.marker([p.lat, p.lon], { icon: icon('#12a4a0') }).addTo(map).bindTooltip(esc(p.name)));
+    if (!edit && !st.view) { const all = [...pins, ...(theirs?.a || [])]; if (all.length) map.fitBounds(all.map(p => [p.lat, p.lon]), { padding: [40, 40], maxZoom: 6 }); }
+    if (edit) map.on('click', e => { if (st.pins.length >= 3) return; keepNames(k); const q = e.latlng.wrap(); st.pins.push({ lat: q.lat, lon: q.lng, name: '' }); renderDay(); });
   } catch (e) { box.innerHTML = '<p class="intro">La carte ne charge pas… vérifie ta connexion.</p>'; }
 }
 function keepNames(k) { (GS[k]?.pins || []).forEach((p, j) => { const el = document.getElementById(`pn${k}_${j}`); if (el) p.name = el.value; }); }
